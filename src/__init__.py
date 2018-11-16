@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import urlparse
 
 import requests
 from parsel import Selector
@@ -23,7 +24,10 @@ class ApiDadosScraper(Scraper):
         # separate method scraping the relevant portion of self.document
         return {
             "swagger": "2.0",
-            **{camel(key): getattr(self, "parse_" + key)() for key in ["info"]},
+            **{
+                camel(key): getattr(self, "parse_" + key)()
+                for key in ["info", "external_docs"]
+            },
         }
 
     def parse_info(self):
@@ -40,3 +44,12 @@ class ApiDadosScraper(Scraper):
         _ = "".join(_.xpath("node()").extract())
         # to github flavoured markdown
         return pandoc(f="html", to="gfm", columns=80, _in=_).rstrip()
+
+    def parse_external_docs(self):
+        return {
+            "description": "Documentação oficial",
+            "url": self.document.root.base_url,
+        }
+
+    def parse_host(self):
+        return urlparse(self.parse_urls()[0]).netloc
