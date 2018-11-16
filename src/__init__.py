@@ -27,7 +27,15 @@ class ApiDadosScraper(Scraper):
             "swagger": "2.0",
             **{
                 camel(key): getattr(self, "parse_" + key)()
-                for key in ["info", "external_docs", "host", "base_path"]
+                for key in [
+                    "info",
+                    "external_docs",
+                    "host",
+                    "base_path",
+                    "schemes",
+                    "produces",
+                    "tags",
+                ]
             },
         }
 
@@ -65,3 +73,18 @@ class ApiDadosScraper(Scraper):
         commom_url = commonprefix(endpoints)
 
         return urlparse(posixpath.join(commom_url.split(name)[0], name)).path
+
+    def parse_schemes(self):
+        return list({urlparse(url).scheme for url in self._parse_urls()})
+
+    def parse_produces(self):
+        return ["application/json"]
+
+    def parse_tags(self):
+        _ = self.document.css(
+            "#scrollingNav ul li[data-name]::attr(data-group)"
+        ).getall()
+        _ = set(_)
+        _ = [{"name": name} for name in _]
+
+        return _
