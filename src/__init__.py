@@ -1,3 +1,4 @@
+import posixpath
 from functools import lru_cache
 from urllib.parse import urlparse
 
@@ -5,7 +6,7 @@ import requests
 from parsel import Selector
 from sh import pandoc
 
-from .util import camel
+from .util import camel, commonprefix
 
 
 class Scraper:
@@ -26,7 +27,7 @@ class ApiDadosScraper(Scraper):
             "swagger": "2.0",
             **{
                 camel(key): getattr(self, "parse_" + key)()
-                for key in ["info", "external_docs"]
+                for key in ["info", "external_docs", "host", "base_path"]
             },
         }
 
@@ -52,4 +53,15 @@ class ApiDadosScraper(Scraper):
         }
 
     def parse_host(self):
-        return urlparse(self.parse_urls()[0]).netloc
+        # infer host using first endpoint url
+        return urlparse(self._parse_urls()[0]).netloc
+
+    def _parse_urls(self):
+        return self.document.css("pre code .pln::text").getall()
+
+    def parse_base_path(self):
+        name = urlparse(self.parse_external_docs()["url"]).path.split("/")[-1]
+        endpoints = self._parse_urls()
+        commom_url = commonprefix(endpoints)
+
+        return urlparse(posixpath.join(commom_url.split(name)[0], name)).path
