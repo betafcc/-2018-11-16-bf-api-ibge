@@ -9,6 +9,8 @@ python = "^3.7"
 tornado = "<5"
 ipython = "^7.1"
 jupyterlab = "^0.35.3"
+requests = "^2.20"
+parsel = "^1.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.9"
