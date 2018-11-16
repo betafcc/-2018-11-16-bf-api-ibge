@@ -2,6 +2,7 @@ from functools import lru_cache
 
 import requests
 from parsel import Selector
+from sh import pandoc
 
 from .util import camel
 
@@ -18,6 +19,8 @@ class Scraper:
 
 class ApiDadosScraper(Scraper):
     def parse(self):
+        # Each top-level field in swagger 2.0 spec should map to one
+        # separate method scraping the relevant portion of self.document
         return {
             "swagger": "2.0",
             **{camel(key): getattr(self, "parse_" + key)() for key in ["info"]},
@@ -27,5 +30,13 @@ class ApiDadosScraper(Scraper):
         return {
             "title": self.document.css("#project h1::text").get(),
             "version": self.document.css(".app-desc").re(r"\s(\d+\.\d+\.\d+)")[0],
-            # "description": self.parse_info_description(),
+            "description": self.parse_info_description(),
         }
+
+    def parse_info_description(self):
+        # get description node
+        _ = self.document.css(".app-desc ~ div")
+        # get inner html
+        _ = "".join(_.xpath("node()").extract())
+        # to github flavoured markdown
+        return pandoc(f="html", to="gfm", columns=80, _in=_).rstrip()

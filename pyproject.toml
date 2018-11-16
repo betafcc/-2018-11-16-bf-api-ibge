@@ -11,6 +11,7 @@ ipython = "^7.1"
 jupyterlab = "^0.35.3"
 requests = "^2.20"
 parsel = "^1.5"
+sh = "^1.12"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.9"
