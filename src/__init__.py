@@ -1,10 +1,11 @@
+import json
 import posixpath
 from functools import lru_cache
 from urllib.parse import urlparse
 
 import requests
 from parsel import Selector
-from sh import pandoc
+from sh import node, pandoc
 
 from .util import camel, commonprefix
 
@@ -35,6 +36,8 @@ class ApiDadosScraper(Scraper):
                     "schemes",
                     "produces",
                     "tags",
+                    # "paths",
+                    "definitions",
                 ]
             },
         }
@@ -86,5 +89,15 @@ class ApiDadosScraper(Scraper):
         ).getall()
         _ = set(_)
         _ = [{"name": name} for name in _]
+
+        return _
+
+    def parse_definitions(self):
+        _ = self.document.xpath(".//script").re(r"(var\sdefs\s=\s{}[\s\S]+)</script>")[
+            0
+        ]
+        _ = _ + "process.stdout.write(JSON.stringify(defs))"
+        _ = node(_in=_)
+        _ = json.loads(str(_))
 
         return _
