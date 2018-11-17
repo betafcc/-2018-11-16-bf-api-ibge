@@ -36,8 +36,8 @@ class ApiDadosScraper(Scraper):
                     "schemes",
                     "produces",
                     "tags",
-                    # "paths",
-                    "definitions",
+                    "paths",
+                    # "definitions",
                 ]
             },
         }
@@ -91,6 +91,28 @@ class ApiDadosScraper(Scraper):
         _ = [{"name": name} for name in _]
 
         return _
+
+    def parse_paths(self):
+        lis = self.document.css("#scrollingNav ul li[data-name]")
+
+        return dict(map(self._parse_paths_endpoint, lis))
+
+    def _parse_paths_endpoint(self, li):
+        li = li.attrib
+        operation_id = li["data-name"]
+
+        #     return (self._parse_paths_path(operation_id), operation_id)
+        return (
+            self._parse_paths_path(operation_id),
+            {"get": {"tags": [li["data-group"]], "operationId": operation_id}},
+        )
+
+    def _parse_paths_path(self, operation_id):
+        return (
+            self.document.css(f"article[data-name={operation_id}] code .pln::text")
+            .get()
+            .split(self.parse_base_path())[-1]
+        )
 
     def parse_definitions(self):
         _ = self.document.xpath(".//script").re(r"(var\sdefs\s=\s{}[\s\S]+)</script>")[
