@@ -104,7 +104,14 @@ class ApiDadosScraper(Scraper):
         #     return (self._parse_paths_path(operation_id), operation_id)
         return (
             self._parse_paths_path(operation_id),
-            {"get": {"tags": [li["data-group"]], "operationId": operation_id}},
+            {
+                "get": {
+                    "tags": [li["data-group"]],
+                    "summary": self._parse_paths_summary(operation_id),
+                    "description": self._parse_paths_description(operation_id),
+                    "operationId": operation_id,
+                }
+            },
         )
 
     def _parse_paths_path(self, operation_id):
@@ -113,6 +120,14 @@ class ApiDadosScraper(Scraper):
             .get()
             .split(self.parse_base_path())[-1]
         )
+
+    def _parse_paths_summary(self, operation_id):
+        return self.document.css(f"article[data-name={operation_id}] h1::text").get()
+
+    def _parse_paths_description(self, operation_id):
+        return self.document.css(
+            f'article[data-name="{operation_id}"] p.marked::text'
+        ).get()
 
     def parse_definitions(self):
         _ = self.document.xpath(".//script").re(r"(var\sdefs\s=\s{}[\s\S]+)</script>")[
