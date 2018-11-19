@@ -37,7 +37,7 @@ class ApiDadosScraper(Scraper):
                     "produces",
                     "tags",
                     "paths",
-                    # "definitions",
+                    "definitions",
                 ]
             },
         }
