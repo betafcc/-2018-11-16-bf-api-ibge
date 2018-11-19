@@ -110,6 +110,7 @@ class ApiDadosScraper(Scraper):
                     "summary": self._parse_paths_summary(operation_id),
                     "description": self._parse_paths_description(operation_id),
                     "operationId": operation_id,
+                    "parameters": self._parse_paths_parameters(operation_id),
                 }
             },
         )
@@ -128,6 +129,19 @@ class ApiDadosScraper(Scraper):
         return self.document.css(
             f'article[data-name="{operation_id}"] p.marked::text'
         ).get()
+
+    def _parse_paths_parameters(self, operation_id):
+        # turns out, theres no need to actually parse de DOM
+        # as the schema is hidden in a script tag for each endpoint
+        _ = (
+            self.document.css(f"article[data-name={operation_id}]")
+            .css("#methodsubtable script")
+            .re(r"var\sschemaWrapper\s=\s({[\s\S]+});")
+        )
+        _ = map(json.loads, _)
+        _ = list(_)
+
+        return _
 
     def parse_definitions(self):
         _ = self.document.xpath(".//script").re(r"(var\sdefs\s=\s{}[\s\S]+)</script>")[
