@@ -23,12 +23,26 @@ class Scraper:
 class ServicoDadosScraper(Scraper):
     url = "https://servicodados.ibge.gov.br/api/docs"
 
+    def parse_base(self):
+        return {
+            self.parse_slug(node): self.parse_info(node)
+            for node in self.find_services()
+        }
+
     def find_services(self):
         return self.document.css(".c-wrapper")
 
     @classmethod
     def parse_slug(cls, service_node):
         return service_node.css(".headline::attr(id)").get()
+
+    @classmethod
+    def parse_info(cls, service_node):
+        return {
+            "headline": "".join(service_node.css(".headline *::text").getall()).strip(),
+            "subhead": "".join(service_node.css(".subhead *::text").getall()).strip(),
+            # "versions": cls.parse_versions(service_node),
+        }
 
 
 class ApiDadosScraper(Scraper):
