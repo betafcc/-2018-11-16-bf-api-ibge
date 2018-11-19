@@ -41,7 +41,22 @@ class ServicoDadosScraper(Scraper):
         return {
             "headline": "".join(service_node.css(".headline *::text").getall()).strip(),
             "subhead": "".join(service_node.css(".subhead *::text").getall()).strip(),
-            # "versions": cls.parse_versions(service_node),
+            "versions": cls.parse_versions(service_node),
+        }
+
+    @classmethod
+    def parse_versions(cls, service_node):
+        return {
+            a.css("::text")
+            .get()
+            .strip(): {
+                "info": {"version": a.css("::text").get().strip()},
+                "externalDocs": {
+                    "description": "Página oficial",
+                    "url": a.css("::attr(href)").get(),
+                },
+            }
+            for a in service_node.css(".services-wrapper a")
         }
 
 
