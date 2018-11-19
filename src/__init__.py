@@ -111,6 +111,7 @@ class ApiDadosScraper(Scraper):
                     "description": self._parse_paths_description(operation_id),
                     "operationId": operation_id,
                     "parameters": self._parse_paths_parameters(operation_id),
+                    "responses": self._parse_paths_responses(operation_id),
                 }
             },
         )
@@ -143,7 +144,23 @@ class ApiDadosScraper(Scraper):
 
         return _
 
+    def _parse_paths_responses(self, operation_id):
+        _ = (
+            self.document.css(f"article[data-name={operation_id}]")
+            .xpath('.//*[starts-with(@id, "responses")]//script')
+            .re(r"var\sschemaWrapper\s=\s({[\s\S]+});")[0]
+        )
+        _ = json.loads(_)
+
+        return {200: _}
+
     def parse_definitions(self):
+        # The definitions are hidden in the first script tag
+        # but are set line by line like so:
+        # var defs = {};
+        # defs.Ufs = {...};
+        # defs.Macrorregiao = {...};
+        # need to grab all the code and run in JS somehow
         _ = self.document.xpath(".//script").re(r"(var\sdefs\s=\s{}[\s\S]+)</script>")[
             0
         ]
