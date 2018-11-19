@@ -20,6 +20,17 @@ class Scraper:
         return Selector(requests.get(url).text, base_url=url)
 
 
+class ServicoDadosScraper(Scraper):
+    url = "https://servicodados.ibge.gov.br/api/docs"
+
+    def find_services(self):
+        return self.document.css(".c-wrapper")
+
+    @classmethod
+    def parse_slug(cls, service_node):
+        return service_node.css(".headline::attr(id)").get()
+
+
 class ApiDadosScraper(Scraper):
     def parse(self):
         # Each top-level field in swagger 2.0 spec should map to one
