@@ -17,6 +17,17 @@ def commonprefix(m):
     return s1
 
 
+def deep_merge(a, b):
+    if not (isinstance(a, dict) and isinstance(b, dict)):
+        return b
+
+    return {
+        **a,
+        **b,
+        **{k: deep_merge(a[k], b[k]) for k in set(a).intersection(set(b))},
+    }
+
+
 class yaml(Box):
     @classmethod
     def load(cls, path):

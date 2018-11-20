@@ -7,7 +7,7 @@ import requests
 from parsel import Selector
 from sh import node, pandoc
 
-from .util import camel, commonprefix
+from .util import camel, commonprefix, deep_merge
 
 
 class Scraper:
@@ -22,6 +22,24 @@ class Scraper:
 
 class ServicoDadosScraper(Scraper):
     url = "https://servicodados.ibge.gov.br/api/docs"
+
+    def parse(self):
+        base = self.parse_base()
+
+        for slug, info in base.items():
+            for version, spec in info["versions"].items():
+                url = spec["externalDocs"]["url"]
+
+                if slug == "malhas":  # malhas special case
+                    scraper = ApiDadosMalhasScraper
+                else:
+                    scraper = ApiDadosScraper
+
+                # print(f'Parsing api "{slug}", version "{version}", at "{url}"')
+
+                info["versions"][version] = deep_merge(spec, scraper(url).parse())
+
+        return base
 
     def parse_base(self):
         return {
@@ -209,3 +227,20 @@ class ApiDadosScraper(Scraper):
         _ = json.loads(str(_))
 
         return _
+
+
+class ApiDadosMalhasScraper(ApiDadosScraper):
+    """
+    Special case for /api/v2/malhas
+
+    It's the only that doesn't provide info in responses,
+    also, the `produces` entry is filled here by hand
+    """
+
+    def parse_produces(self):
+        return ["image/svg+xml", "application/vnd.geo+json", "application/json"]
+
+    def _parse_paths_responses(self, operation_id):
+        if operation_id == "idGet":
+            return {"description": "Malha renderizada"}
+        raise
