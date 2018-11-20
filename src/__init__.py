@@ -1,4 +1,5 @@
 import json
+import logging
 import posixpath
 from functools import lru_cache
 from urllib.parse import urlparse
@@ -8,6 +9,11 @@ from parsel import Selector
 from sh import node, pandoc
 
 from .util import camel, commonprefix, deep_merge
+
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 
 class Scraper:
@@ -35,7 +41,7 @@ class ServicoDadosScraper(Scraper):
                 else:
                     scraper = ApiDadosScraper
 
-                # print(f'Parsing api "{slug}", version "{version}", at "{url}"')
+                logger.info(f'parsing "{slug}" version "{version}" at "{url}"')
 
                 info["versions"][version] = deep_merge(spec, scraper(url).parse())
 
