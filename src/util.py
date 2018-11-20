@@ -34,12 +34,17 @@ class yaml(Box):
         with open(path) as fp:
             return cls(oyaml.load(fp))
 
-    def dump(self, path=None):
-        str = oyaml.dump(self.to_dict(), allow_unicode=True, default_flow_style=False)
+    def dump(self, path=None, **kwargs):
+        result = oyaml.dump(
+            self.to_dict(), allow_unicode=True, default_flow_style=False, **kwargs
+        )
         if not path:
-            return str
-        with open(path, "w") as fp:
-            fp.write(str)
+            return result
+        if isinstance(path, str):
+            with open(path, "w") as fp:
+                fp.write(result)
+        else:
+            path.write(result)
 
     def __repr__(self):
         return self.dump()
