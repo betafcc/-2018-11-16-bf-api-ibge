@@ -21,6 +21,7 @@ if __name__ == "__main__":
     todas.dump(file)
 
     for slug in todas:
-        file = out_dir / (slug + ".yaml")
-        logger.info(f'writing "{slug}" to "{file}"')
-        todas[slug].dump(file)
+        for version, spec in todas[slug]['versions'].items():
+            file = out_dir / (f'{slug}{version}.yaml')
+            logger.info(f'writing "{slug}" to "{file}"')
+            spec.dump(file)

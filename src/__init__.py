@@ -185,7 +185,7 @@ class ApiDadosScraper(Scraper):
             self.document.css(f"article[data-name={operation_id}] code .pln::text")
             .get()
             .split(self.parse_base_path())[-1]
-        )
+        ) or "/"
 
     def _parse_paths_summary(self, operation_id):
         return self.document.css(f"article[data-name={operation_id}] h1::text").get()
