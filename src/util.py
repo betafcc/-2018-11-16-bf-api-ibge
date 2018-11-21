@@ -40,10 +40,10 @@ class yaml(Box):
         )
         if not path:
             return result
-        if isinstance(path, str):
+        try:
             with open(path, "w") as fp:
                 fp.write(result)
-        else:
+        except TypeError:
             path.write(result)
 
     def __repr__(self):
