@@ -1,97 +1,112 @@
 import json
-import logging
 import posixpath
+from abc import ABCMeta, abstractmethod, abstractproperty
+from collections.abc import Mapping
 from functools import lru_cache
 from urllib.parse import urlparse
 
 import requests
+from boltons.cacheutils import cachedproperty
 from parsel import Selector
 from sh import node, pandoc
+from toolz import unique
 
-from .util import camel, commonprefix, deep_merge
-
-
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+from .util import call, camel, commonprefix, deep_merge, yaml
 
 
-class Scraper:
-    def __init__(self, url=None):
-        self.document = self.get(url or self.url)
-
-    @staticmethod
-    @lru_cache(None)
-    def get(url):
-        return Selector(requests.get(url).text, base_url=url)
+def api_docs_service(url):
+    if "malhas" == urlparse(url).path.split("/"):
+        # malhas needs a special case
+        return ApiDocsMalhas(url)
+    return ApiDocsService(url)
 
 
-class ServicoDadosScraper(Scraper):
+class Mixins(Mapping, metaclass=ABCMeta):
+    url: str
+
+    @abstractmethod
+    def asdict(self) -> dict:
+        ...
+
+    @cachedproperty
+    def _asdict(self):
+        return self.asdict()
+
+    @cachedproperty
+    def document(self):
+        return Selector(requests.get(self.url).text, base_url=self.url)
+
+    def asyaml(self):
+        return yaml(self)
+
+    def __len__(self):
+        return len(self._asdict)
+
+    def __iter__(self):
+        yield from self._asdict.keys()
+
+    def __getitem__(self, item):
+        return self._asdict[item]
+
+
+@call
+class api_docs(Mixins):
     url = "https://servicodados.ibge.gov.br/api/docs"
 
-    def parse(self):
-        base = self.parse_base()
+    def asdict(self):
+        return dict(zip(self.slugs, self.infos))
 
-        for slug, info in base.items():
-            for version, spec in info["versions"].items():
-                url = spec["externalDocs"]["url"]
+    @property
+    def incomplete_specs(self):
+        for slug, info in self.items():
+            for version, incomplete_spec in info["versions"].items():
+                yield f"{slug}_v{version}", incomplete_spec
 
-                if slug == "malhas":  # malhas special case
-                    scraper = ApiDadosMalhasScraper
-                else:
-                    scraper = ApiDadosScraper
+    @property
+    def slugs(self):
+        for node in self._service_wrappers:
+            yield node.css(".headline::attr(id)").get()
 
-                logger.info(f'parsing "{slug}" version "{version}" at "{url}"')
+    @property
+    def infos(self):
+        for node in self._service_wrappers:
+            yield {
+                "headline": "".join(node.css(".headline *::text").getall()).strip(),
+                "subhead": "".join(node.css(".subhead *::text").getall()).strip(),
+                "versions": dict(self._versions(node)),
+            }
 
-                info["versions"][version] = deep_merge(spec, scraper(url).parse())
-
-        return base
-
-    def parse_base(self):
-        return {
-            self.parse_slug(node): self.parse_info(node)
-            for node in self.find_services()
-        }
-
-    def find_services(self):
+    @property
+    def _service_wrappers(self):
         return self.document.css(".c-wrapper")
 
-    @classmethod
-    def parse_slug(cls, service_node):
-        return service_node.css(".headline::attr(id)").get()
-
-    @classmethod
-    def parse_info(cls, service_node):
-        return {
-            "headline": "".join(service_node.css(".headline *::text").getall()).strip(),
-            "subhead": "".join(service_node.css(".subhead *::text").getall()).strip(),
-            "versions": cls.parse_versions(service_node),
-        }
-
-    @classmethod
-    def parse_versions(cls, service_node):
-        return {
-            a.css("::text")
-            .get()
-            .strip(): {
-                "info": {"version": a.css("::text").get().strip()},
+    def _versions(self, node):
+        for a in node.css(".services-wrapper a"):
+            version = a.css("::text").get().strip()
+            incomplete_spec = {
+                "info": {"version": version},
                 "externalDocs": {
-                    "description": "Página oficial",
+                    "description": "Documentação oficial",
                     "url": a.css("::attr(href)").get(),
                 },
             }
-            for a in service_node.css(".services-wrapper a")
-        }
+
+            yield (version, incomplete_spec)
 
 
-class ApiDadosScraper(Scraper):
-    def parse(self):
-        # Each top-level field in swagger 2.0 spec should map to one
-        # separate method scraping the relevant portion of self.document
+class ApiDocsService(Mixins):
+    def __init__(self, url):
+        self.url = url
+
+    def asdict(self):
+        return self.spec
+
+    @property
+    def spec(self):
         return {
             "swagger": "2.0",
             **{
-                camel(key): getattr(self, "parse_" + key)()
+                camel(key): getattr(self, key)
                 for key in [
                     "info",
                     "external_docs",
@@ -106,14 +121,16 @@ class ApiDadosScraper(Scraper):
             },
         }
 
-    def parse_info(self):
+    @property
+    def info(self):
         return {
             "title": self.document.css("#project h1::text").get(),
             "version": self.document.css(".app-desc").re(r"\s(\d+\.\d+\.\d+)")[0],
-            "description": self.parse_info_description(),
+            "description": self._info_description,
         }
 
-    def parse_info_description(self):
+    @cachedproperty
+    def _info_description(self):
         # get description node
         _ = self.document.css(".app-desc ~ div")
         # get inner html
@@ -121,81 +138,94 @@ class ApiDadosScraper(Scraper):
         # to github flavoured markdown
         return pandoc(f="html", to="gfm", columns=80, _in=_).rstrip()
 
-    def parse_external_docs(self):
+    @property
+    def external_docs(self):
         return {
             "description": "Documentação oficial",
             "url": self.document.root.base_url,
         }
 
-    def parse_host(self):
+    @property
+    def host(self):
         # infer host using first endpoint url
-        return urlparse(self._parse_urls()[0]).netloc
+        return urlparse(self._urls[0]).netloc
 
-    def _parse_urls(self):
+    @property
+    def _urls(self):
         return self.document.css("pre code .pln::text").getall()
 
-    def parse_base_path(self):
-        name = urlparse(self.parse_external_docs()["url"]).path.split("/")[-1]
-        endpoints = self._parse_urls()
-        commom_url = commonprefix(endpoints)
+    @property
+    def base_path(self):
+        endpoint_slug = urlparse(self.external_docs["url"]).path.split("/")[-1]
+        commom_url = commonprefix(self._urls)
 
-        return urlparse(posixpath.join(commom_url.split(name)[0], name)).path
+        return urlparse(
+            posixpath.join(commom_url.split(endpoint_slug)[0], endpoint_slug)
+        ).path
 
-    def parse_schemes(self):
-        return list({urlparse(url).scheme for url in self._parse_urls()})
+    @property
+    def schemes(self):
+        return list({urlparse(url).scheme for url in self._urls})
 
-    def parse_produces(self):
+    @property
+    def produces(self):
         return ["application/json"]
 
-    def parse_tags(self):
+    @property
+    def tags(self):
         _ = self.document.css(
             "#scrollingNav ul li[data-name]::attr(data-group)"
         ).getall()
-        _ = set(_)
+        _ = unique(_)  # don't use set, keep original order
         _ = [{"name": name} for name in _]
 
         return _
 
-    def parse_paths(self):
-        lis = self.document.css("#scrollingNav ul li[data-name]")
+    @property
+    def paths(self):
+        acc = {}
+        for li in self._paths_lis:
+            acc.update(self._paths_endpoint(li))
+        return acc
 
-        return dict(map(self._parse_paths_endpoint, lis))
+    @property
+    def _paths_lis(self):
+        return self.document.css("#scrollingNav ul li[data-name]")
 
-    def _parse_paths_endpoint(self, li):
+    def _paths_endpoint(self, li):
         li = li.attrib
         operation_id = li["data-name"]
 
-        #     return (self._parse_paths_path(operation_id), operation_id)
-        return (
-            self._parse_paths_path(operation_id),
+        yield (
+            self._paths_path(operation_id),
             {
                 "get": {
                     "tags": [li["data-group"]],
-                    "summary": self._parse_paths_summary(operation_id),
-                    "description": self._parse_paths_description(operation_id),
+                    "summary": self._paths_summary(operation_id),
+                    "description": self._paths_description(operation_id),
                     "operationId": operation_id,
-                    "parameters": self._parse_paths_parameters(operation_id),
-                    "responses": self._parse_paths_responses(operation_id),
+                    "parameters": self._paths_parameters(operation_id),
+                    "responses": self._paths_responses(operation_id),
                 }
             },
         )
 
-    def _parse_paths_path(self, operation_id):
+    def _paths_path(self, operation_id):
         return (
             self.document.css(f"article[data-name={operation_id}] code .pln::text")
             .get()
-            .split(self.parse_base_path())[-1]
+            .split(self.base_path)[-1]
         ) or "/"
 
-    def _parse_paths_summary(self, operation_id):
+    def _paths_summary(self, operation_id):
         return self.document.css(f"article[data-name={operation_id}] h1::text").get()
 
-    def _parse_paths_description(self, operation_id):
+    def _paths_description(self, operation_id):
         return self.document.css(
             f'article[data-name="{operation_id}"] p.marked::text'
         ).get()
 
-    def _parse_paths_parameters(self, operation_id):
+    def _paths_parameters(self, operation_id):
         # turns out, theres no need to actually parse de DOM
         # as the schema is hidden in a script tag for each endpoint
         _ = (
@@ -208,7 +238,7 @@ class ApiDadosScraper(Scraper):
 
         return _
 
-    def _parse_paths_responses(self, operation_id):
+    def _paths_responses(self, operation_id):
         _ = (
             self.document.css(f"article[data-name={operation_id}]")
             .xpath('.//*[starts-with(@id, "responses")]//script')
@@ -218,7 +248,8 @@ class ApiDadosScraper(Scraper):
 
         return {200: _}
 
-    def parse_definitions(self):
+    @cachedproperty
+    def definitions(self):
         # The definitions are hidden in the first script tag
         # but are set line by line like so:
         # var defs = {};
@@ -235,7 +266,7 @@ class ApiDadosScraper(Scraper):
         return _
 
 
-class ApiDadosMalhasScraper(ApiDadosScraper):
+class ApiDocsMalhas(ApiDocsService):
     """
     Special case for /api/v2/malhas
 
@@ -243,10 +274,11 @@ class ApiDadosMalhasScraper(ApiDadosScraper):
     also, the `produces` entry is filled here by hand
     """
 
-    def parse_produces(self):
+    @property
+    def produces(self):
         return ["image/svg+xml", "application/vnd.geo+json", "application/json"]
 
-    def _parse_paths_responses(self, operation_id):
+    def _paths_responses(self, operation_id):
         if operation_id == "idGet":
             return {"description": "Malha renderizada"}
         raise
