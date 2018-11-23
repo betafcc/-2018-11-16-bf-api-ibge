@@ -57,12 +57,6 @@ class api_docs(Mixins):
         return dict(zip(self.slugs, self.infos))
 
     @property
-    def incomplete_specs(self):
-        for slug, info in self.items():
-            for version, incomplete_spec in info["versions"].items():
-                yield f"{slug}_v{version}", incomplete_spec
-
-    @property
     def slugs(self):
         for node in self._service_wrappers:
             yield node.css(".headline::attr(id)").get()

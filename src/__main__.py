@@ -1,27 +1,32 @@
-import logging
-import sys
 from pathlib import Path
 
-from src import ServicoDadosScraper
-from src.util import yaml
+import fire
+import requests
+
+from . import api_docs
+from .util import yaml
+
+
+def specs_base():
+    return api_docs.asyaml().dump()
+
+
+def list_specs(specs_base: str):
+    for slug_name, info in yaml.load(specs_base).items():
+        for version, incomplete_spec in info["versions"].items():
+            yield _slug(slug_name=slug_name, version=version)
+
+
+_slug = "{slug_name}_v{version}".format
+_split_slug = lambda s: s.split("_v")
+
+
+def fetch(slug, specs_base):
+    slug_name, version = _split_slug(slug)
+    url = yaml.load(specs_base)[slug_name].versions[version].externalDocs.url
+
+    return requests.get(url).text
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger(__name__)
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.DEBUG)
-
-    out_dir = Path(__file__).resolve().parent.parent / "apis"
-    out_dir.mkdir(exist_ok=True)
-
-    todas = yaml(ServicoDadosScraper().parse())
-
-    file = out_dir / "todas.yaml"
-    logger.info(f'writing "todas" to "{file}"')
-    todas.dump(file)
-
-    for slug in todas:
-        for version, spec in todas[slug]['versions'].items():
-            file = out_dir / (f'{slug}{version}.yaml')
-            logger.info(f'writing "{slug}" to "{file}"')
-            spec.dump(file)
+    fire.Fire()
