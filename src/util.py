@@ -1,5 +1,9 @@
+from functools import reduce
+
 import oyaml
 from box import Box
+import apistar
+import apistar.validators
 
 
 def call(f):
@@ -21,15 +25,27 @@ def commonprefix(m):
     return s1
 
 
-def deep_merge(a, b):
+def deep_merge(*dicts):
+    return reduce(_deep_merge, dicts)
+
+
+def _deep_merge(a, b):
     if not (isinstance(a, dict) and isinstance(b, dict)):
         return b
 
     return {
         **a,
         **b,
-        **{k: deep_merge(a[k], b[k]) for k in set(a).intersection(set(b))},
+        **{k: _deep_merge(a[k], b[k]) for k in set(a).intersection(set(b))},
     }
+
+
+def spec_errors(spec):
+    try:
+        apistar.validate(spec, format='swagger')
+        return []
+    except apistar.validators.ValidationError as error:
+        return error.args[0]
 
 
 class yaml(Box):
