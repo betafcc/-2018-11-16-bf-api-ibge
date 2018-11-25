@@ -11,49 +11,59 @@ from parsel import Selector
 from sh import node, pandoc
 from toolz import unique
 
-from .util import call, camel, commonprefix, deep_merge, yaml
+from .util import call, camel, commonprefix, yaml
 
 
-def api_docs_service(url):
-    if "malhas" == urlparse(url).path.split("/"):
+def parse_api_docs_service(slug_name, html, base_url):
+    if slug_name == "malhas":
         # malhas needs a special case
-        return ApiDocsMalhas(url)
-    return ApiDocsService(url)
+        return ApiDocsMalhas.from_html(html, base_url)
+    return ApiDocsService.from_html(html, base_url)
 
 
 class Mixins(Mapping, metaclass=ABCMeta):
-    url: str
+    def __init__(self, document):
+        self.document = document
+
+    @classmethod
+    def from_html(cls, html, base_url=None):
+        if base_url is None:
+            return cls(document=Selector(html))
+        else:
+            return cls(document=Selector(html, base_url=base_url))
+
+
+    @classmethod
+    def from_url(cls, url=None):
+        if url is None:
+            url = cls.url
+        return cls(document=Selector(requests.get(url).text, base_url=url))
 
     @abstractmethod
-    def asdict(self) -> dict:
+    def to_dict(self) -> dict:
         ...
 
     @cachedproperty
-    def _asdict(self):
-        return self.asdict()
-
-    @cachedproperty
-    def document(self):
-        return Selector(requests.get(self.url).text, base_url=self.url)
+    def _to_dict(self):
+        return self.to_dict()
 
     def asyaml(self):
         return yaml(self)
 
     def __len__(self):
-        return len(self._asdict)
+        return len(self._to_dict)
 
     def __iter__(self):
-        yield from self._asdict.keys()
+        yield from self._to_dict.keys()
 
     def __getitem__(self, item):
-        return self._asdict[item]
+        return self._to_dict[item]
 
 
-@call
-class api_docs(Mixins):
+class ApiDocsHome(Mixins):
     url = "https://servicodados.ibge.gov.br/api/docs"
 
-    def asdict(self):
+    def to_dict(self):
         return dict(zip(self.slugs, self.infos))
 
     @property
@@ -89,10 +99,7 @@ class api_docs(Mixins):
 
 
 class ApiDocsService(Mixins):
-    def __init__(self, url):
-        self.url = url
-
-    def asdict(self):
+    def to_dict(self):
         return self.spec
 
     @property
@@ -230,6 +237,10 @@ class ApiDocsService(Mixins):
         _ = map(json.loads, _)
         _ = list(_)
 
+        for el in _:
+            if el.get('in') == 'path':
+                el['required'] = True
+
         return _
 
     def _paths_responses(self, operation_id):
@@ -240,7 +251,7 @@ class ApiDocsService(Mixins):
         )
         _ = json.loads(_)
 
-        return {200: _}
+        return {'200': _}
 
     @cachedproperty
     def definitions(self):
