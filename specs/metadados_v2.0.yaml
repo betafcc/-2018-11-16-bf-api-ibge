@@ -1,0 +1,190 @@
+info:
+  version: 2.0.0
+  title: API de metadados
+  description: 'Para fins de documentação desta API, pesquisa e operação estatística
+    são
+
+    intercambiáveis. Para maiores informações, veja Tipo de operação estatística em
+
+    http://www.metadados.ibge.gov.br/consulta/glossario.aspx'
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/metadados?versao=2
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v2/metadados
+schemes:
+- http
+produces:
+- application/json
+tags:
+- name: Metadados
+- name: Periodos
+- name: Pesquisas
+paths:
+  /{pesquisa}/{YYYY}/{MM}/{order}:
+    get:
+      tags:
+      - Metadados
+      summary: Metatados por pesquisa e período pesquisado
+      description: Obtém as ocorrências, na base de metadados, nas quais a pesquisa
+        é citada, em um dado período
+      operationId: pesquisaYYYYMMOrderGet
+      parameters:
+      - name: pesquisa
+        in: path
+        description: 'Identificador da pesquisa na base de metadados
+
+
+          Para obter a listagem de pesquisas com metadados associados, consulte: https://servicodados.ibge.gov.br/api/docs/metadados?versao=2#api-Pesquisas-pesquisasGet'
+        required: true
+        type: string
+        x-codegen-hasMoreRequired: false
+      - name: YYYY
+        in: path
+        description: 'Ano a ser usado como critério da pesquisa
+
+
+          Exemplo: http://servicodados.ibge.gov.br/api/v2/metadados/AC/2003/'
+        required: true
+        type: number
+      - name: MM
+        in: path
+        description: Mês a ser usado como critério da pesquisa - Válido somente quando
+          a pesquisa for de natureza conjuntural, ou seja, cuja periodicidade de publicação
+          seja inferior a um ano. Informar conforme a ordem do mês no ano - Janeiro
+          = *1*, Fevereiro = *2* etc
+        required: true
+        type: number
+      - name: order
+        in: path
+        description: Caso haja mais de uma publicação de uma mesma pesquisa para um
+          mesmo período pesquisado, a ordem de publicação será definida pelo parâmetro
+          order, sendo o numeral *0* uma referência à primeira ocorrência no período.
+          Caso omitido, assume o valor *0*
+        required: true
+        type: number
+      responses:
+        '200':
+          description: Array de metadados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Metadado'
+  /pesquisas/{pesquisa}/periodos:
+    get:
+      tags:
+      - Periodos
+      summary: Períodos
+      description: Obtém os períodos pesquisados com metadados associados.
+      operationId: pesquisasPesquisaPeriodosGet
+      parameters:
+      - name: pesquisa
+        in: path
+        description: 'Identificador da pesquisa na base de metadados
+
+
+          Para obter a listagem de pesquisas com metadados associados, consulte: https://servicodados.ibge.gov.br/api/docs/metadados?versao=2#api-Pesquisas-pesquisasGet'
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Array de períodos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Periodo'
+  /pesquisas:
+    get:
+      tags:
+      - Pesquisas
+      summary: Pesquisas
+      description: Obtém as pesquisas com metadados associados
+      operationId: pesquisasGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de pesquisas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Pesquisa'
+definitions:
+  Metadado:
+    type: object
+    properties:
+      situacao:
+        type: string
+        description: Indica o estado da pesquisa. Pode assumir os valores *corrente*,
+          para pesquisas que fazem parte do plano corrente da instituição; *concluída*,
+          para pesquisas que foram planejadas para serem realizadas apenas uma vez;
+          *desativadas*, para pesquisas que foram descontinuadas; *em implantação*,
+          para pesquisas que estão sendo implantadas; *em reformulação*, para pesquisas
+          que estão sendo reformuladas
+      categoria:
+        type: string
+        description: Podem assumir os valores *conjuntural* ou *estrutural*. Conjuntural
+          refere-se à pesquisas que possuem periodicidade da publicação inferior a
+          um ano. Já as estruturais possuem periodicidade de publicação anual ou superior
+          a um ano, **INDEPENDENTE** da periodicidade da coleta dos dados
+      tipo:
+        type: string
+        description: Tipo de operação estatística
+      area:
+        type: string
+      sigla:
+        type: string
+        description: Sigla da pesquisa
+      data_inicio:
+        type: string
+        description: Início da pesquisa segundo o formato dd/MM/yyyy
+      data_desativacao:
+        type: string
+        description: Se a pesquisa estiver desativada, esta propriedade informará
+      url-sidra:
+        type: string
+        description: URL para acessar os dados no SIDRA, Sistema IBGE de Recuperação
+          Automática, sistema que fornece os dados referentes às informações estatísticas
+      url-concla:
+        type: string
+        description: Caso a pesquisa possua relação com a CNAE,  Classificação Nacional
+          de Atividades Econômicas, esta propriedade informará a URL para acessar
+          esses dados
+      classificacoes_tematicas:
+        type: array
+        items:
+          type: object
+          description: Cada objeto refere-se à Classificação de Informações Estatísticas
+            da pesquisa. Para maiores informações, acesse http://www.metadados.ibge.gov.br/consulta/prnClassificacaoTematica.aspx
+          properties: {}
+      ocorrencias_pesquisa:
+        type: array
+        items:
+          type: object
+          description: Metadados associados ao período pesquisado. Varia conforme
+            a pesquisa
+          properties: {}
+  Periodo:
+    type: object
+    properties:
+      ano:
+        type: number
+        description: Ano no qual há metadados associados
+      mes:
+        type: string
+        description: Mês no qual há metadados associados
+      ordem:
+        type: string
+        description: Caso seja registrado mais de uma ocorrência de metadados para
+          um mesmo período pesquisado, a ordem de publicação será definida pela propriedade
+          ordem, sendo o numeral *0* o mais recente
+  Pesquisa:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código da pesquisa
+      nome:
+        type: string
+        description: Nome da pesquisa
+

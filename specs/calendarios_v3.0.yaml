@@ -1,0 +1,173 @@
+info:
+  version: 3.0.0
+  title: API Calendário
+  description: Calendário de divulgação das pesquisas
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/calendario?versao=3
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v3/calendario
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Calendario
+paths:
+  /{pesquisa}:
+    get:
+      tags:
+      - Calendario
+      summary: Calendário por pesquisa
+      description: Obtém o calendário de divulgações de uma pesquisa.
+      operationId: pesquisaGet
+      parameters:
+      - name: pesquisa
+        in: path
+        description: "Identificador ou alias do pesquisa ou produto - Consulte https://servicodados.ibge.gov.br/api/docs/produtos\
+          \ para obter o identificador ou alias do pesquisa ou produto. \n\n https://servicodados.ibge.gov.br/api/v3/calendario/9173\
+          \ \n\n      Obtém o calendário de divulgações da Pesquisa Nacional por Amostra\
+          \ de Domicílios Contínua, cujo identificador é **9173** \n\n https://servicodados.ibge.gov.br/api/v3/calendario/contas-nacionais-trimestrais\
+          \ \n\n     Obtém o calendário de divulgações da pesquisa Contas Nacionais\
+          \ Trimestrais, cujo alias é **contas-nacionais-trimestrais**"
+        required: true
+        type: string
+      - name: qtd
+        in: query
+        description: "Quantidade de itens por página. \n\n https://servicodados.ibge.gov.br/api/v3/calendario/contas-nacionais-trimestrais/?qtd=3\
+          \ \n\n      Obtém até **3** resultados por página do calendário de divulgações\
+          \ da pesquisa Contas Nacionais Trimestrais, cujo alias é **contas-nacionais-trimestrais**"
+        required: false
+        type: integer
+      - name: de
+        in: query
+        description: "Data mínima de divulgação. YYYY-MM-DD \n\n https://servicodados.ibge.gov.br/api/v3/calendario/contas-nacionais-trimestrais/?de=2018-08-20\
+          \ \n\n      Obtém o calendário de divulgações da pesquisa Contas Nacionais\
+          \ Trimestrais, cujo alias é **contas-nacionais-trimestrais**, a partir da\
+          \ data **20/08/2018**"
+        required: false
+        type: string
+        format: date
+      - name: ate
+        in: query
+        description: "Data máxima de divulgação. YYYY-MM-DD \n\n https://servicodados.ibge.gov.br/api/v3/calendario/contas-nacionais-trimestrais/?ate=2018-08-20\
+          \ \n\n      Obtém o calendário de divulgações da pesquisa Contas Nacionais\
+          \ Trimestrais, cujo alias é **contas-nacionais-trimestrais**, até a data\
+          \ **20/08/2018**"
+        required: false
+        type: string
+        format: date
+      responses:
+        '200':
+          description: Resultado com informações de paginação.
+          schema:
+            $ref: '#/definitions/PagedResult'
+  /:
+    get:
+      tags:
+      - Calendario
+      summary: Calendário
+      description: Obtém o calendário das divulgações
+      operationId: rootGet
+      parameters:
+      - name: qtd
+        in: query
+        description: "Quantidade de itens por página. \n\n Exemplo: \n\n https://servicodados.ibge.gov.br/api/v3/calendario/?qtd=3\
+          \ \n\n      Obtém até **3** resultados por página do calendário de divulgações\
+          \ de pesquisas"
+        required: false
+        type: integer
+      - name: de
+        in: query
+        description: "Data mínima de divulgação. YYYY-MM-DD \n\n Exemplo: \n\n https://servicodados.ibge.gov.br/api/v3/calendario/?de=2018-12-20\
+          \ \n\n      Obtém o calendário de divulgações de pesquisas a partir da data\
+          \ **20/12/2018**"
+        required: false
+        type: string
+        format: date
+      - name: ate
+        in: query
+        description: "Data máxima de divulgação. YYYY-MM-DD \n\n Exemplo: \n\n https://servicodados.ibge.gov.br/api/v3/calendario/?ate=2017-01-20\
+          \ \n\n      Obtém o calendário de divulgações de pesquisas até a data **20/01/2017**"
+        required: false
+        type: string
+        format: date
+      responses:
+        '200':
+          description: Resultado com informações de paginação.
+          schema:
+            $ref: '#/definitions/PagedResult'
+definitions:
+  Calendario:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Identificador do item de calendário.
+      titulo:
+        type: string
+        description: Título do item de calendário.
+      descricao:
+        type: string
+        description: Descrição do item de calendário.
+      data_divulgacao:
+        type: string
+        format: date-time
+        description: Data da divulgação.
+      produto_id:
+        type: integer
+        description: Identificador da pesquisa.
+      nome_produto:
+        type: string
+        description: Nome da pesquisa.
+      alias_produto:
+        type: string
+        description: Alias do nome da pesquisa.
+      descricao_produto:
+        type: string
+        description: Descrição da pesquisa.
+      ano_referencia_inicio:
+        type: integer
+        description: Ano do início da data de referência da pesquisa.
+      mes_referencia_inicio:
+        type: integer
+        description: Mês do início da data de referência da pesquisa.
+      ano_referencia_fim:
+        type: integer
+        description: Ano do fim da data de referência da pesquisa.
+      mes_referencia_fim:
+        type: integer
+        description: Mês do início da data de referência da pesquisa.
+    description: Informações sobre o a divulgação
+  PagedResult:
+    type: object
+    properties:
+      count:
+        type: integer
+        description: Quantidade total de itens.
+      page:
+        type: integer
+        description: Página aual.
+      totalPages:
+        type: integer
+        description: Total de páginas.
+      nextPage:
+        type: integer
+        description: Próxima página.
+      previousPage:
+        type: integer
+        description: Página anterior.
+      showingFrom:
+        type: integer
+        description: Número do primeiro item da página.
+      showingTo:
+        type: integer
+        description: Número do último item da página.
+      items:
+        type: array
+        description: Lista de itens no resultado.
+        items:
+          $ref: '#/definitions/Calendario'
+    description: Informações para paginação.
+

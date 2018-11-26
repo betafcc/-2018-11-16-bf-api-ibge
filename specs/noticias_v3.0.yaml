@@ -1,0 +1,189 @@
+info:
+  version: 3.0.0
+  title: API Notícias
+  description: 'Nesta API estão disponíveis as notícias e releases sobre as pesquisas,
+    estudos e
+
+    produtos elaborados pelo IBGE, assim como a produção jornalística da [Agência
+
+    IBGE Notícias](http://agenciadenoticias.ibge.gov.br)'
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/noticias?versao=3
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v3/noticias
+schemes:
+- http
+produces:
+- application/json
+tags:
+- name: Noticias
+paths:
+  /:
+    get:
+      tags:
+      - Noticias
+      summary: Notícias
+      description: Obtém o conjunto de notícias
+      operationId: rootGet
+      parameters:
+      - name: tipo
+        in: query
+        description: "Informa se deseja consultar Notícias ou Releases. Não informando,\
+          \ retornará ambos os tipos.\n\n http://servicodados.ibge.gov.br/api/v3/noticias\
+          \ \n\n    Obtém **notícias** e **releases**\n\n http://servicodados.ibge.gov.br/api/v3/noticias/?tipo=noticia\
+          \ \n\n    Obtém **apenas notícias** \n\n http://servicodados.ibge.gov.br/api/v3/noticias/?tipo=release\
+          \ \n\n    Obtém **apenas releases**"
+        required: false
+        type: string
+        enum:
+        - noticia
+        - release
+      - name: qtd
+        in: query
+        description: "Quantidade de itens por página. Caso não informado, será retornado\
+          \ todos os itens encontrados.\n\n http://servicodados.ibge.gov.br/api/v3/noticias/?qtd=3\
+          \ \n\n    Obtém **3** notícias por página"
+        required: false
+        type: integer
+        default: 0
+      - name: page
+        in: query
+        description: "Página desejada da listagem, levando em conta a quantidade de\
+          \ itens por página. Caso não informado, será retornada a primeira página.\n\
+          \n http://servicodados.ibge.gov.br/api/v3/noticias/?page=2 \n\n     Obtém\
+          \ a lista de notícias na **2**ª página"
+        required: false
+        type: integer
+        default: 1
+      - name: de
+        in: query
+        description: "Data mínima de publicação. Formato MM-DD-YYYY \n\n http://servicodados.ibge.gov.br/api/v3/noticias/?de=09-27-2017\
+          \ \n\n    Obtém notícias com datas posteriores a **27/09/2017**"
+        required: false
+        type: string
+        format: date
+      - name: ate
+        in: query
+        description: "Data máxima de publicação. MM-DD-YYYY \n\n http://servicodados.ibge.gov.br/api/v3/noticias/?ate=09-27-2017\
+          \ \n\n    Obtém notícias com datas anteriores a **27/09/2017**"
+        required: false
+        type: string
+        format: date
+      - name: introsize
+        in: query
+        description: "Tamanho máximo do texto de introdução. O texto será truncado\
+          \ no valor estipulado.\n\n http://servicodados.ibge.gov.br/api/v3/noticias/?introsize=30\
+          \ \n\n    Obtém notícias com texto de introdução limitados em **30** caracteres"
+        required: false
+        type: integer
+        default: 255
+      - name: destaque
+        in: query
+        description: "Informa se o resultado deverá vir ordenado por destaque ou não.\
+          \ O padrão é sim.\n\n http://servicodados.ibge.gov.br/api/v3/noticias/?destaque=0\
+          \ \n\n    Obtém notícias **sem** ordenação por destaque"
+        required: false
+        type: integer
+        default: 1
+        enum:
+        - '0'
+        - '1'
+      - name: busca
+        in: query
+        description: "Termo de busca para consulta de notícias e releases.\n\n http://servicodados.ibge.gov.br/api/v3/noticias/?busca=silvicultura\
+          \ \n\n    Obtém notícias e releases que possuem o termo **silvicultura**\
+          \ no texto"
+        required: false
+        type: string
+      - name: idproduto
+        in: query
+        description: "Um ou mais identificadores de pesquisas ou produtos delimitados\
+          \ pelo caracter **|** (pipe) - Consulte https://servicodados.ibge.gov.br/api/docs/produtos\
+          \ para obter os identificadores das pesquisas ou produtos \n\n http://servicodados.ibge.gov.br/api/v3/noticias/?idproduto=9050\
+          \ \n\n    Obtém notícias relacionadas ao produto ou pesquisa cujo identificador\
+          \ é **9050** \n\n http://servicodados.ibge.gov.br/api/v3/noticias/?idproduto=9050|9088\
+          \ \n\n     Obtém notícias relacionadas aos produtos e pesquisas cujos identificadores\
+          \ são **9050** e **9088**"
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Resultado com informações de paginação.
+          schema:
+            $ref: '#/definitions/PagedResult'
+definitions:
+  Noticia:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Identificador da notícia.
+      tipo:
+        type: string
+        description: Se é Notícia ou Release.
+      titulo:
+        type: string
+        description: Título da notícia.
+      introducao:
+        type: string
+        description: Texto de introdução da notícia.
+      data_publicacao:
+        type: string
+        format: date-time
+        description: Data de publicação da notícia.
+      produto_id:
+        type: integer
+        description: Identificador da pesquisa relacionada (se houver).
+      produtos:
+        type: string
+        description: Informações sobre os produtos relacionados (se houver).
+      editorias:
+        type: string
+        description: A quais editorias a notícia pertence.
+      imagens:
+        type: string
+        description: Imagens atreladas à notícia.
+      produtos_relacionados:
+        type: string
+        description: Identificadores de todos os produtos relacionados (se houver).
+      destaque:
+        type: boolean
+        description: Indica se é uma notícia em destaque ou não.
+      link:
+        type: string
+        format: url
+        description: URL para a página da notícia.
+    description: Informações sobre a notícia
+  PagedResult:
+    type: object
+    properties:
+      count:
+        type: integer
+        description: Quantidade total de itens.
+      page:
+        type: integer
+        description: Página aual.
+      totalPages:
+        type: integer
+        description: Total de páginas.
+      nextPage:
+        type: integer
+        description: Próxima página.
+      previousPage:
+        type: integer
+        description: Página anterior.
+      showingFrom:
+        type: integer
+        description: Número do primeiro item da página.
+      showingTo:
+        type: integer
+        description: Número do último item da página.
+      items:
+        type: array
+        description: Lista de itens no resultado.
+        items:
+          $ref: '#/definitions/Noticia'
+    description: Informações para paginação.
+

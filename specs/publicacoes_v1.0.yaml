@@ -1,0 +1,111 @@
+info:
+  version: 1.0.0
+  title: API Publicações
+  description: 'Nossa biblioteca. Aqui você consegue consultar as publicações produzidas
+    pelo
+
+    IBGE'
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/publicacoes?versao=1
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v1/publicacoes
+schemes:
+- http
+produces:
+- application/json
+tags:
+- name: Publicacoes
+paths:
+  /{produto}:
+    get:
+      tags:
+      - Publicacoes
+      summary: Publicação por critério de busca
+      description: Obtém uma lista de publicações relacionadas a um termo de busca.
+      operationId: produtoGet
+      parameters:
+      - name: produto
+        in: path
+        description: "Nome do produto a ser buscado. \n\n http://servicodados.ibge.gov.br/api/v1/publicacoes/agropecuaria\
+          \ \n\n     Obtém publicações que possuem o termo **agropecuaria**"
+        required: true
+        type: string
+      - name: qtd
+        in: query
+        description: "Quantidade de itens por página. \n\n http://servicodados.ibge.gov.br/api/v1/publicacoes/agropecuaria/?qtd=3\
+          \ \n\n     Obtém **3** publicações por página, buscando pelo termo **agropecuaria** "
+        required: false
+        type: integer
+        default: 30
+      - name: page
+        in: query
+        description: "Página desejada da listagem, levando em conta a quantidade de\
+          \ itens por página. \n\n http://servicodados.ibge.gov.br/api/v1/publicacoes/agropecuaria/?qtd=3&page=3\
+          \ \n\n     Obtém **3** publicações da **3**ª página, buscando pelo termo\
+          \ **agropecuaria**"
+        required: false
+        type: integer
+        default: 1
+      responses:
+        '200':
+          description: Resultado com informações de paginação.
+          schema:
+            $ref: '#/definitions/PagedResult'
+definitions:
+  PagedResult:
+    type: object
+    properties:
+      count:
+        type: integer
+        description: Quantidade total de itens.
+      page:
+        type: integer
+        description: Página aual.
+      totalPages:
+        type: integer
+        description: Total de páginas.
+      nextPage:
+        type: integer
+        description: Próxima página.
+      previousPage:
+        type: integer
+        description: Página anterior.
+      showingFrom:
+        type: integer
+        description: Número do primeiro item da página.
+      showingTo:
+        type: integer
+        description: Número do último item da página.
+      items:
+        type: array
+        description: Lista de itens no resultado.
+        items:
+          $ref: '#/definitions/Publicacao'
+    description: Informações para paginação.
+  Publicacao:
+    type: object
+    properties:
+      chave:
+        type: integer
+        description: Chave da publicação, que é composta pelo código do tipo e o identificador
+          do item.
+      id:
+        type: integer
+        description: Identificador da publicação.
+      titulo:
+        type: string
+        description: Título da publicação.
+      autor:
+        type: string
+        description: Autores da publicação.
+      ano:
+        type: string
+        description: Ano da publicação.
+      link:
+        type: string
+        format: url
+        description: URL para a página de detalhes da publicação.
+    description: Informações sobre a publicação.
+

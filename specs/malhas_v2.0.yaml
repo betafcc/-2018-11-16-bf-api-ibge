@@ -1,0 +1,88 @@
+info:
+  version: 2.0.0
+  title: Malhas
+  description: "Malhas referentes às unidades administrativas do Brasil. O formato\
+    \ renderizado\nserá de acordo com o parâmetro **Accept** do cabeçalho HTTP  \n\
+    \  \n\n    image/svg+xml            - SVG\n    application/vnd.geo+json - Geo\
+    \ JSon\n    application/json         - TopoJSon\n\n  \n  \n  \n**obs 1:** consulte\
+    \ os identificadores das localidades por meio da [API de\nLocalidades](https://servicodados.ibge.gov.br/api/docs/localidades)"
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/malhas?versao=2
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v2/malhas
+schemes:
+- http
+produces:
+- image/svg+xml
+- application/vnd.geo+json
+- application/json
+tags:
+- name: Malhas
+paths:
+  /{id}:
+    get:
+      tags:
+      - Malhas
+      summary: Malha por identificador
+      description: Obtém a malha referente ao identificador da localidade.
+      operationId: idGet
+      parameters:
+      - name: id
+        in: path
+        description: "Identificador da localidade. Caso omitido, assume o valor **BR**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/malhas/33 \n\n   Obtém a malha\
+          \ referente ao Rio de Janeiro (**33**)"
+        required: true
+        type: string
+      - name: resolucao
+        in: query
+        description: "Nível de detalhamento obtido com a malha. Pode assumir os seguintes\
+          \ valores\n\n```\n0. Nenhuma divisão político-administrativa é inserida\
+          \ no interior da malha\n1. Inclui na malha as macrorregiões. Válido apenas\
+          \ quando a localidade for BR.\n2. Inclui na malha as Unidades da Federação.\
+          \ Válido apenas quando a localidade for BR ou uma macroregião\n3. Inclui\
+          \ na malha as mesorregiões. Válido apenas quando a localidade for BR, macroregião\
+          \ ou Unidade da Federação\n4. Inclui na malha as microrregiões. Válido apenas\
+          \ quando a localidade for BR, macroregião, Unidade da Federação ou mesorregião\n\
+          5. Inclui na malha os municípios\n```\n\nPor padrão, assume o valor **0**\n\
+          \nhttps://servicodados.ibge.gov.br/api/v2/malhas/?resolucao=2 \n\n     Obtém\
+          \ a malha referente ao Brasil - localidade padrão quando não informada -\
+          \ com resolução **2**"
+        required: false
+        type: number
+      - name: qualidade
+        in: query
+        description: "Padrão de qualidade da imagem. Pode assumir valores de 1 a 4,\
+          \ sendo 1 o de qualidade mais inferior. Por padrão, assume o valor **4**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/malhas/?qualidade=1 \n\n    Obtém\
+          \ a malha referente ao Brasil - localidade padrão quando não informada -\
+          \ com qualidade **1**"
+        required: false
+        type: number
+      - name: view
+        in: query
+        description: Modo de visualização da malha. Útil apenas quando a malha for
+          renderizada no formato **image/svg+xml**, que é o padrão quando for requisitada
+          a partir do navegador (Internet Explorer, Firefox, Opera, Chrome etc). Dependendo
+          das configurações dos navegadores, algumas personalizações (cor do preenchimento,
+          cor e espessura do contorno) podem não ser aplicadas. Como forma de contornar
+          essa limitação, configure o parâmetro view com o valor **browser**. Por
+          padrão, o valor desse parâmetro é **raw**, que faz com que nenhuma personalização
+          seja previamente aplicada à malha.
+        required: false
+        type: string
+      - name: formato
+        in: query
+        description: "Formato de renderização da malha. Útil quando o usuário preferir\
+          \ informar o formato de renderização diretamente na URL do navegador, sem\
+          \ a necessidade de informar o parâmetro **Accept**\n\n https://servicodados.ibge.gov.br/api/v2/malhas/?formato=application/vnd.geo+json\
+          \ \n\n    Obtém a malha referente ao Brasil - localidade padrão quando não\
+          \ informada - no formato **application/vnd.geo+json**"
+        required: false
+        type: string
+      responses:
+        description: Malha renderizada
+definitions: {}
+

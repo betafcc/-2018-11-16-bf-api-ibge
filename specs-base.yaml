@@ -1,0 +1,130 @@
+agregados:
+  headline: Agregados
+  subhead: Análise multidimensional ao seu alcance.
+  versions:
+    '2.0':
+      info:
+        version: '2.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/agregados?versao=2
+    '3.0':
+      info:
+        version: '3.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/agregados?versao=3
+calendarios:
+  headline: Calendário
+  subhead: Conheça o cronograma de ações e publicações do IBGE
+  versions:
+    '3.0':
+      info:
+        version: '3.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/calendario?versao=3
+cnae:
+  headline: CNAE
+  subhead: API referente à Classificação Nacional de Atividades Econômicas
+  versions:
+    '2.0':
+      info:
+        version: '2.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/cnae?versao=2
+localidades:
+  headline: Localidades
+  subhead: Obtenha os dados sobre as divisões administrativas do Brasil
+  versions:
+    '1.0':
+      info:
+        version: '1.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/localidades?versao=1
+malhas:
+  headline: Malhas geográficas
+  subhead: Malhas com as mais diversas resoluções e formatos para você liberar a sua
+    imaginação
+  versions:
+    '2.0':
+      info:
+        version: '2.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/malhas?versao=2
+metadados:
+  headline: Metadados
+  subhead: Metadados associados às pesquisas
+  versions:
+    '2.0':
+      info:
+        version: '2.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/metadados?versao=2
+nomes:
+  headline: Nomes
+  subhead: A API por trás do fenômeno da mídia Nomes no Brasil
+  versions:
+    '2.0':
+      info:
+        version: '2.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/censos/nomes?versao=2
+noticias:
+  headline: Notícias
+  subhead: Consulte os releases e notícias publicados na Agência IBGE Notícias
+  versions:
+    '3.0':
+      info:
+        version: '3.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/noticias?versao=3
+pesquisas:
+  headline: Pesquisas
+  subhead: Uma de nossas mais poderosas API's, usada no desenvolvimento do Brasil
+    Cidades e Censo Agropecuário
+  versions:
+    '1.0':
+      info:
+        version: '1.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/pesquisas?versao=1
+produtos:
+  headline: Produtos
+  subhead: Informações básicas de todos os produtos de estatística e geociências produzidos
+    pelo IBGE.
+  versions:
+    '1.0':
+      info:
+        version: '1.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/produtos?versao=1
+projecoes:
+  headline: Projeções
+  subhead: Projeções para você programar suas necessidades
+  versions:
+    '1.0':
+      info:
+        version: '1.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/projecoes?versao=1
+publicacoes:
+  headline: Publicações
+  subhead: A nossa biblioteca. Aqui você encontra as publicações produzidas pelo IBGE.
+  versions:
+    '1.0':
+      info:
+        version: '1.0'
+      externalDocs:
+        description: Documentação oficial
+        url: https://servicodados.ibge.gov.br/api/docs/publicacoes?versao=1
+

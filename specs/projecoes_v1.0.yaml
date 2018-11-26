@@ -1,0 +1,89 @@
+info:
+  version: 1.0.0
+  title: API de projeções
+  description: "Projeções disponibilizadas pelo IBGE  \n  \n  \n**obs 1:** consulte\
+    \ os identificadores das localidades por meio da [API de\nLocalidades](https://servicodados.ibge.gov.br/api/docs/localidades)"
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/projecoes?versao=1
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v1/projecoes
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Populacao
+paths:
+  /populacao:
+    get:
+      tags:
+      - Populacao
+      summary: Projeção da população do Brasil
+      description: Obtém a projecao da população referente ao Brasil
+      operationId: populacaoGet
+      parameters: []
+      responses:
+        '200':
+          description: Um objeto projeção populacional
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Populacao'
+  /populacao/{localidade}:
+    get:
+      tags:
+      - Populacao
+      summary: Projeção da população por localidade
+      description: Obtém a projecao da população
+      operationId: populacaoLocalidadeGet
+      parameters:
+      - name: localidade
+        in: path
+        description: "Identificador da localidade. Use o código **BR** para referir-se\
+          \ ao Brasil. \n\n https://servicodados.ibge.gov.br/api/v1/projecoes/populacao/BR\
+          \ \n\n    Obtém a projeção da população do Brasil (**BR**).\n\n https://servicodados.ibge.gov.br/api/v1/projecoes/populacao/3\
+          \ \n\n    Obtém a projeção da população da região Sudeste (**3**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto projeção populacional
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Populacao'
+definitions:
+  PeriodoMedio:
+    type: object
+    properties:
+      incrementoPopulacional:
+        type: string
+        description: Período médio em millisegundos para a população aumentar em uma
+          unidade
+      nascimento:
+        type: string
+        description: Período médio entre nascimentos
+      obito:
+        type: string
+        description: Período médio entre óbitos
+  Populacao:
+    type: object
+    properties:
+      localidade:
+        type: string
+      horario:
+        type: string
+        description: Horário da projeção no formato dd/MM/yyyy HH:mm:ss
+      projecao:
+        $ref: '#/definitions/Projecao'
+  Projecao:
+    type: object
+    properties:
+      populacao:
+        type: number
+        description: Projeção populacional
+      periodoMedio:
+        $ref: '#/definitions/PeriodoMedio'
+

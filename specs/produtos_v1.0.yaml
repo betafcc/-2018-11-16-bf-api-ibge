@@ -1,0 +1,89 @@
+info:
+  version: 1.0.0
+  title: API Produtos
+  description: 'Produtos de estatísticas e geociências do IBGE. Útil para realizar
+    consultas por
+
+    um produto específico nas APIs de
+
+    [calendário](https://servicodados.ibge.gov.br/api/docs/calendario?versao=3) e
+
+    de [notícias](https://servicodados.ibge.gov.br/api/docs/noticias?versao=3)'
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/produtos?versao=1
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v1/produtos
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Produtos
+paths:
+  /estatisticas:
+    get:
+      tags:
+      - Produtos
+      summary: Produtos de estatística
+      description: Obtém a lista dos produtos de estatística do IBGE.
+      operationId: estatisticasGet
+      parameters: []
+      responses:
+        '200':
+          description: Lista de produtos do IBGE.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Produto'
+  /geociencias:
+    get:
+      tags:
+      - Produtos
+      summary: Produtos de geociências
+      description: Obtém a lista dos produtos de geociências do IBGE.
+      operationId: geocienciasGet
+      parameters: []
+      responses:
+        '200':
+          description: Lista de produtos do IBGE.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Produto'
+  /:
+    get:
+      tags:
+      - Produtos
+      summary: Produtos
+      description: Obtém a lista dos produtos do IBGE.
+      operationId: rootGet
+      parameters: []
+      responses:
+        '200':
+          description: Lista de produtos do IBGE.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Produto'
+definitions:
+  Produto:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Identificador do produto.
+      tipo:
+        type: string
+        description: Se é um produto da área de estatística ou de geociências.
+      titulo:
+        type: string
+        description: Título do produto.
+      alias:
+        type: string
+        description: Nome do produto de forma amigável para máquinas (sem caracteres
+          especiais nem espaços), que também pode ser usado como parâmetro na API
+          de calendário e notícias.
+    description: Informações básicas sobre o produto
+

@@ -1,0 +1,573 @@
+info:
+  version: 2.0.0
+  title: API CNAE - Cadastro Nacional de Atividades Econômicas
+  description: "A CNAE, Classificação Nacional de Atividades Econômicas, é a classificação\n\
+    oficialmente adotada pelo Sistema Estatístico Nacional na produção de\nestatísticas\
+    \ por tipo de atividade econômica, e pela Administração Pública, na\nidentificação\
+    \ da atividade econômica em cadastros e registros de pessoa\njurídica. A CNAE\
+    \ não faz distinção entre tipo de propriedade, natureza\njurídica, tamanho do\
+    \ negócio e modo de operação, uma vez que tais critérios não\ninterferem na caracterização\
+    \ da atividade em si.  \n  \nO IBGE é o órgão gestor da CNAE, responsável pela\
+    \ documentação da classificação,\ndesenvolvimento dos instrumentos de apoio, disseminação\
+    \ e atendimento aos\nusuários sobre a aplicação da classificação. Compete-lhe\
+    \ ainda a manutenção da\nclassificação e a condução dos processos de revisão.\
+    \  \n  \nExceptuando as subclasses, que estão na versão 2.2, a presente versão\
+    \ 2.0,\nresultante da revisão 2007, substituiu a 1.0. Essa versão é uma classificação\n\
+    organizada de forma hierárquica com cinco níveis, 21 seções, 87 divisões, 285\n\
+    grupos, 673 classes e 1301 subclasses. **As subclasses são definidas para uso\
+    \ da\nAdministração Pública.**  \n  \n\n``` \n 1. Seção\n   2. Divisão\n     3.\
+    \ Grupo\n       4. Classe\n         5. Subclasse\n           6. Atividade econômica\n\
+    ```\n\n  \nPara mais informações, acesse\n<https://cnae.ibge.gov.br/images/concla/documentacao/CNAE20_Introducao.pdf>\
+    \  \n  \n**obs:** a partir do dia primeiro de janeiro de 2019, as subclasses,\
+    \ e somente\nas subclasses, serão migradas para a versão 2.3. Portanto, a partir\
+    \ da referida\ndata, a versão 2.2 será descontinuada."
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/cnae?versao=2
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v2/cnae
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Classes
+- name: Divisoes
+- name: Grupos
+- name: Secoes
+- name: Subclasses
+paths:
+  /classes/{classe}:
+    get:
+      tags:
+      - Classes
+      summary: Classe por identificador
+      description: Obtém o conjunto de classes a partir dos respectivos identificadores
+      operationId: classesClasseGet
+      parameters:
+      - name: classe
+        in: path
+        description: "Um ou mais identificadores de classes delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/classes/01113\
+          \ \n\n    Obtém a classe cujo identificador é **01113**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/classes/01113|01121\
+          \ \n\n    Obtém as classes cujos identificadores são **01113** e **01121**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de classes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Classe'
+  /classes:
+    get:
+      tags:
+      - Classes
+      summary: Classes
+      description: Obtém o conjunto de classes
+      operationId: classesGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de classes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Classe'
+  /divisoes/{divisao}/classes:
+    get:
+      tags:
+      - Classes
+      summary: Classes por divisão
+      description: Obtém o conjunto de classes a partir dos identificadores das divisões
+      operationId: divisoesDivisaoClassesGet
+      parameters:
+      - name: divisao
+        in: path
+        description: "Um ou mais identificadores de divisões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/1/classes\
+          \ \n\n    Obtém as classes que pertencem à divisão cujo identificador é\
+          \ **1**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/1|2/classes\
+          \ \n\n    Obtém as classes que pertencem às divisões cujos identificadores\
+          \ são **1** e **2**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de classes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Classe'
+  /grupos/{grupo}/classes:
+    get:
+      tags:
+      - Classes
+      summary: Classes por grupo
+      description: Obtém o conjunto de classes a partir dos identificadores dos grupos
+      operationId: gruposGrupoClassesGet
+      parameters:
+      - name: grupo
+        in: path
+        description: "Um ou mais identificadores de grupos delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/11/classes\
+          \ \n\n    Obtém as classes que pertencem ao grupo cujo identificador é **11**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/11|12/classes \n\n\
+              Obtém as classes que pertencem aos grupos cujos identificadores são\
+          \ **11** e **12**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de classes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Classe'
+  /secoes/{secao}/classes:
+    get:
+      tags:
+      - Classes
+      summary: Classes por seção
+      description: Obtém o conjunto de classes a partir dos identificadores das seções
+      operationId: secoesSecaoClassesGet
+      parameters:
+      - name: secao
+        in: path
+        description: "Um ou mais identificadores de seções delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/B/classes\
+          \ \n\n    Obtém as classes que pertencem à seção cujo identificador é **B**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/B|C/classes \n\n\
+              Obtém as classes que pertencem às seções cujos identificadores são **B**\
+          \ e **C**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de classes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Classe'
+  /divisoes/{divisao}:
+    get:
+      tags:
+      - Divisoes
+      summary: Divisão por identificador
+      description: Obtém o conjunto de divisões a partir dos respectivos identificadores
+      operationId: divisoesDivisaoGet
+      parameters:
+      - name: divisao
+        in: path
+        description: "Um ou mais identificadores de divisões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/05\
+          \ \n\n    Obtém a divisão cujo identificador é **05**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/05|06\
+          \ \n\n    Obtém as divisões cujos identificadores são **05** e **06**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de divisões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Divisao'
+  /divisoes:
+    get:
+      tags:
+      - Divisoes
+      summary: Divisões
+      description: Obtém o conjunto de divisões
+      operationId: divisoesGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de divisões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Divisao'
+  /secoes/{secao}/divisoes:
+    get:
+      tags:
+      - Divisoes
+      summary: Divisões por seção
+      description: Obtém o conjunto de divisões a partir dos identificadores das seções
+      operationId: secoesSecaoDivisoesGet
+      parameters:
+      - name: secao
+        in: path
+        description: "Um ou mais identificadores de seções delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/A/divisoes\
+          \ \n\n    Obtém as divisões pertencentes à seção cujo identificador é **A**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/B|C/divisoes \n\n\
+              Obtém as divisões pertencentes às seções cujos identificadores são **B**\
+          \ e **C**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de divisões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Divisao'
+  /divisoes/{divisao}/grupos:
+    get:
+      tags:
+      - Grupos
+      summary: Grupos por divisão
+      description: Obtém o conjunto de grupos a partir dos identificadores das divisões
+      operationId: divisoesDivisaoGruposGet
+      parameters:
+      - name: divisao
+        in: path
+        description: "Um ou mais identificadores de divisões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/01/grupos\
+          \ \n\n    Obtém os grupos que pertencem à divisão cujo identificador é **01**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/02|03/grupos \n\
+          \n    Obtém os grupos que pertencem às divisões cujos identificadores são\
+          \ **02** e **03**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de grupos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Grupo'
+  /grupos:
+    get:
+      tags:
+      - Grupos
+      summary: Grupos
+      description: Obtém o conjunto de grupos
+      operationId: gruposGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de grupos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Grupo'
+  /grupos/{grupo}:
+    get:
+      tags:
+      - Grupos
+      summary: Grupo por identificador
+      description: Obtém o conjunto de grupos a partir dos respectivos identificadores
+      operationId: gruposGrupoGet
+      parameters:
+      - name: grupo
+        in: path
+        description: "Um ou mais identificadores de grupos delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/21\
+          \ \n\n    Obtém o grupo cujo identificador é **21**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/21|22\
+          \ \n\n    Obtém os grupos cujos identificadores são **21** e **22**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de grupos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Grupo'
+  /secoes/{secao}/grupos:
+    get:
+      tags:
+      - Grupos
+      summary: Grupos por seção
+      description: Obtém o conjunto de grupos a partir dos identificadores das seções
+      operationId: secoesSecaoGruposGet
+      parameters:
+      - name: secao
+        in: path
+        description: "Um ou mais identificadores de seções delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/B/grupos\
+          \ \n\n    Obtém os grupos que pertencem à seção cujo identificador é **B**\n\
+          \n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/B|D/grupos \n\n    Obtém\
+          \ os grupos que pertencem às seções cujos identificadores são **B** e **D**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de grupos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Grupo'
+  /secoes:
+    get:
+      tags:
+      - Secoes
+      summary: Seções
+      description: Obtém o conjunto de seções
+      operationId: secoesGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de seções
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Secao'
+  /secoes/{secao}:
+    get:
+      tags:
+      - Secoes
+      summary: Seção por identificador
+      description: Obtém o conjunto de seções a partir dos respectivos identificadores
+      operationId: secoesSecaoGet
+      parameters:
+      - name: secao
+        in: path
+        description: "Um ou mais identificadores de seções delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/A\
+          \ \n\n    Obtém a seção cujo identificador é **A**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/A|B|C\
+          \ \n\n    Obtém as seções cujos identificadores são **A** , **B** e **C**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de seções
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Secao'
+  /classes/{classe}/subclasses:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasses por classe
+      description: Obtém o conjunto de subclasses a partir dos identificadores das
+        classes
+      operationId: classesClasseSubclassesGet
+      parameters:
+      - name: classe
+        in: path
+        description: "Um ou mais identificadores de classes delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/classes/02101/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem à classe cujo identificador\
+          \ é **02101**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/classes/02101|02209/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem às classes cujos identificadores\
+          \ são **02101** e **02209**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+  /divisoes/{divisao}/subclasses:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasses por divisão
+      description: Obtém o conjunto de subclasses a partir dos identificadores das
+        divisões
+      operationId: divisoesDivisaoSubclassesGet
+      parameters:
+      - name: divisao
+        in: path
+        description: "Um ou mais identificadores de divisões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/1/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem à divisão cujo identificador\
+          \ é **1**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/divisoes/1|2/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem às divisões cujos identificadores\
+          \ são **1** e **2**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+  /grupos/{grupo}/subclasses:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasses por grupo
+      description: Obtém o conjunto de subclasses a partir dos identificadores dos
+        grupos
+      operationId: gruposGrupoSubclassesGet
+      parameters:
+      - name: grupo
+        in: path
+        description: "Um ou mais identificadores de grupos delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/21/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem ao grupo cujo identificador\
+          \ é **21**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/grupos/21|22/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem aos grupos cujos identificadores\
+          \ são **21** e **22**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+  /secoes/{secao}/subclasses:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasses por seção
+      description: Obtém o conjunto de subclasses a partir dos identificadores das
+        seções
+      operationId: secoesSecaoSubclassesGet
+      parameters:
+      - name: secao
+        in: path
+        description: "Um ou mais identificadores de seções delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/E/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem à seção cujo identificador é\
+          \ **E**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/secoes/R|S/subclasses\
+          \ \n\n    Obtém as subclasses que pertencem às seções cujos identificadores\
+          \ são **R** e **S**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+  /subclasses:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasses
+      description: Obtém o conjunto de subclasses
+      operationId: subclassesGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+  /subclasses/{subclasse}:
+    get:
+      tags:
+      - Subclasses
+      summary: Subclasse por identificador
+      description: Obtém o conjunto de subclasses a partir dos respectivos identificadores
+      operationId: subclassesSubclasseGet
+      parameters:
+      - name: subclasse
+        in: path
+        description: "Um ou mais identificadores de subclasses delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v2/cnae/subclasses/0500301\
+          \ \n\n    Obtém a subclasse cujo identificador é **0500301**\n\n https://servicodados.ibge.gov.br/api/v2/cnae/subclasses/0500301|0729405\
+          \ \n\n    Obtém as subclasses cujos identificadores são **0500301** e **0729405**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de subclasses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subclasse'
+definitions:
+  Classe:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador da classe
+      descricao:
+        type: string
+        description: Descrição da classe
+      observacoes:
+        type: array
+        description: Array de observações da classe
+        items:
+          type: string
+      grupo:
+        $ref: '#/definitions/Grupo'
+  Divisao:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador da divisão
+      descricao:
+        type: string
+        description: Descrição da divisão
+      observacoes:
+        type: array
+        description: Array de observações da divisão
+        items:
+          type: string
+      secao:
+        $ref: '#/definitions/Secao'
+  Grupo:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador do grupo
+      descricao:
+        type: string
+        description: Descricao do grupo
+      observacoes:
+        type: array
+        description: Array de observações do grupo
+        items:
+          type: string
+      divisao:
+        $ref: '#/definitions/Divisao'
+  Secao:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador da seção
+      descricao:
+        type: string
+        description: Descrição da seção
+      observacoes:
+        type: array
+        description: Array de observações da seção
+        items:
+          type: string
+  Subclasse:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador da subclasse
+      descricao:
+        type: string
+        description: Descrição da subclasse
+      observacoes:
+        type: array
+        description: Array de observações da subclasse
+        items:
+          type: string
+      atividades:
+        type: array
+        description: Atividades relacionadas à subclasse
+        items:
+          type: string
+      classe:
+        $ref: '#/definitions/Classe'
+

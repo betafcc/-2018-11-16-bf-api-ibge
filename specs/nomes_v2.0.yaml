@@ -1,0 +1,156 @@
+info:
+  version: 2.0.0
+  title: API Nomes
+  description: "Coletados pela primeira vez no Censo 2010, informa a frequência dos\
+    \ nomes por\ndécada de nascimento  \n  \n  \n**obs 1:** consulte os identificadores\
+    \ das localidades por meio da [API de\nLocalidades](https://servicodados.ibge.gov.br/api/docs/localidades).\
+    \ Para\nBrasil, use o identificador **BR**"
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/censos/nomes?versao=2
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v2/censos/nomes
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Nomes
+- name: Ranking
+paths:
+  /{nome}:
+    get:
+      tags:
+      - Nomes
+      summary: Frequência por nome
+      description: Obtém a frequência de nascimentos por década para o nome consultado
+      operationId: nomeGet
+      parameters:
+      - name: nome
+        in: path
+        description: "Um ou mais nomes delimitados pelo caracter **|** (pipe)\n\n\
+          \ https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao \n\n    Frequência\
+          \ referente ao nome <strong>João</strong>\n\n https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao|maria\
+          \ \n\n    Frequências referentes aos nomes <strong>João</strong> e <strong>Maria</strong>"
+        required: true
+        type: string
+      - name: sexo
+        in: query
+        description: "Por padrão, a consulta pelo nome é unissex. Caso deseje filtrar\
+          \ pelo sexo, informe o parâmetro sexo, cujos valores podem ser **M**, para\
+          \ o sexo masculino, ou **F**, para o feminino\n\n https://servicodados.ibge.gov.br/api/v2/censos/nomes/ariel?sexo=F\
+          \ \n\n    Frequência referente ao nome <strong>Ariel</strong>, sexo <strong>F</strong>eminino"
+        required: false
+        type: string
+      - name: groupBy
+        in: query
+        description: "Caso deseje obter a frequência por algum nível geográfico, informe\
+          \ o parâmetro groupBy - Válido apenas quando informado um único nome. Nesta\
+          \ versão, apenas o valor **UF** é válido, no qual se obtém a frequência\
+          \ do nome informado por Unidade da Federação\n\n https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao?groupBy=UF\
+          \ \n\n    Frequência referente ao nome <strong>João</strong>, agrupados\
+          \ por Unidade da Federação (<strong>UF</strong>)"
+        required: false
+        type: string
+      - name: localidade
+        in: query
+        description: "Caso deseje obter a frequência referente a uma dada localidade,\
+          \ informe o parâmetro localidade. Por padrão, assume o valor **BR**, mas\
+          \ pode ser o identificador de um município ou de uma Unidade da Federação\n\
+          \n https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao?localidade=33\
+          \ \n\n   Frequência referente ao nome <strong>João</strong> no Rio de Janeiro\
+          \ (<strong>33</strong>)"
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Objeto nome - Caso groupBy seja informado, as propriedades
+            nome e sexo serão omitidas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nome'
+  /ranking:
+    get:
+      tags:
+      - Ranking
+      summary: Ranking por frequência
+      description: Obtém o ranking dos nomes segundo a frequência de nascimentos por
+        década
+      operationId: rankingGet
+      parameters:
+      - name: decada
+        in: query
+        description: "Caso deseje obter o ranking referente a uma década de nascimento\
+          \ específica, informe o parâmetro decada\n\n https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking/?decada=1950\
+          \ \n\n   Ranking segundo a frequência para os nascidos na década de <strong>1950</strong>"
+        required: false
+        type: string
+      - name: localidade
+        in: query
+        description: "Caso deseje obter o ranking referente a uma dada localidade,\
+          \ informe o parâmetro localidade. Por padrão, assume o valor **BR**, mas\
+          \ pode ser o identificador de um município ou de uma Unidade da Federação\n\
+          \n https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking?localidade=3300100\
+          \ \n\n   Ranking segundo a frequência no município de Angra dos Reis/RJ\
+          \ (<strong>3300100</strong>)"
+        required: false
+        type: string
+      - name: sexo
+        in: query
+        description: "Por padrão, o ranking é unissex. Caso deseje obter o ranking\
+          \ pelo sexo, informe o parâmetro sexo, cujos valores podem ser **M**, para\
+          \ o sexo masculino, ou **F**, para o feminino\n\n https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking/?sexo=M\
+          \ \n\n   Ranking segundo a frequência para o sexo <strong>M</strong>asculino"
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Um objeto ranking
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Ranking'
+definitions:
+  Nome:
+    type: object
+    properties:
+      nome:
+        type: string
+      localidade:
+        type: string
+      sexo:
+        type: string
+      res:
+        type: array
+        items:
+          $ref: '#/definitions/resByNome'
+  Ranking:
+    type: object
+    properties:
+      localidade:
+        type: string
+      sexo:
+        type: string
+      res:
+        type: array
+        items:
+          $ref: '#/definitions/resByranking'
+  resByNome:
+    type: object
+    properties:
+      periodo:
+        type: string
+      frequencia:
+        type: number
+  resByranking:
+    type: object
+    properties:
+      nome:
+        type: string
+      frequencia:
+        type: number
+      ranking:
+        type: number
+

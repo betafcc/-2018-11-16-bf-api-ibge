@@ -1,0 +1,905 @@
+info:
+  version: 2.0.0
+  title: API de dados agregados do IBGE
+  description: "Incremente sua aplicação com a API de dados agregados do IBGE. **Cada\
+    \ Agregado\ncorresponde a uma Tabela do SIDRA**, Sistema IBGE de Recuperação Automática,\
+    \ que\né a ferramenta responsável por disponibilizar os dados das pesquisas\n\
+    conjunturais, estruturais e censos, realizadas pelo IBGE. Para saber mais sobre\n\
+    o SIDRA, acesse <https://sidra.ibge.gov.br>  \n  \n  \n**obs 1**: para desenvolvedores\
+    \ de soluções OLAP, Online Analytical Processing,\nos conceitos de variáveis,\
+    \ classificações e categorias são, respectivamente,\nidênticos aos de medidas,\
+    \ dimensões e membros."
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/agregados?versao=2
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v2/agregados
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Agregados
+- name: Metadados
+- name: Variaveis
+paths:
+  /:
+    get:
+      tags:
+      - Agregados
+      summary: Agregados
+      description: Obtém o conjunto de agregados, agrupados pelas respectivas pesquisas,
+        a partir da base do SIDRA
+      operationId: agregadosGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de agregados agrupados por pesquisa
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Pesquisa'
+  /{agregado}/metadados:
+    get:
+      tags:
+      - Metadados
+      summary: Metadados
+      description: Obtém os metadados associados ao agregados
+      operationId: agregadosAgregadoMetadadosGet
+      parameters:
+      - name: agregado
+        in: path
+        description: Identificador do agregado
+        required: true
+        type: number
+        format: int64
+      responses:
+        '200':
+          description: Objeto metadado
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Metadado'
+  /{agregado}/periodos/{periodos}/variaveis:
+    get:
+      tags:
+      - Variaveis
+      summary: Variáveis por agregado e períodos pesquisados
+      description: Obtém o conjunto de variáveis a partir do identificador do agregado
+        e períodos pesquisados
+      operationId: agregadosAgregadoPeriodosPeriodosVariaveisGet
+      parameters:
+      - name: agregado
+        in: path
+        description: Identificador do agregado
+        required: true
+        type: number
+        format: int64
+        x-codegen-hasMoreRequired: false
+      - name: periodos
+        in: path
+        description: 'Período do qual se deseja obter os resultados. Informe valores
+          negativos para obter os últimos resultados. Para um mês específico, informe-o
+          segundo o padrão **YYYYMM**, no qual *YYYY* refere-se ao ano e *MM* ao mês.
+          Pode conter um ou mais períodos delimitados pelo caracter **|** (pipe)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/-6/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/-6/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 nos últimos
+          seis períodos pesquisados (**-6**) **obs**: valores negativos não podem
+          ser usados conjuntamente com outros períodos
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 no primeiro
+          semestre de 2017 (**201701-201706**). Observe que é possível informar um
+          intervalo segundo o padrão **&lt;INICIO>-&lt;FIM>**
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201706/201708|201710/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706|201710/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 no primeiro
+          semestre (**201701-201706**) e no mês de outubro (**201710**) de 2017
+
+
+          '
+        required: true
+        type: string
+      - name: localidades
+        in: query
+        description: 'Uma ou mais localidades delimitadas pelo caracter | (pipe).
+          Caso não informada, será considerado o Brasil, cujo identificador é **BR**.
+          Para qualquer localidade que NÃO seja Macrorregião, Unidade da Federação,
+          Mesorregião, Microrregião e Município, essa deve seguir o padrão  **N&lt;NIVEL_GEOGRAFICO>[&lt;LOCALIDADE>]**
+          - Para saber mais sobre os identificadores das localidades, acesse <a target=''_blank''
+          href=''https://sidra.ibge.gov.br/territorio''>https://sidra.ibge.gov.br/territorio</a>
+          - em que **&lt;LOCALIDADE>** pode ser uma ou mais localidades separadas
+          por vírgula. É possível ainda generalizar o resultado, informando a classe
+          da localidade, conforme os exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam regiões metropolitanas (**N7**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**).
+          Observe que 3501 e 3301 são, respectivamente, os identificadores das regiões
+          metropolitanas de São Paulo e Rio de Janeiro. Não podem ser confundidos,
+          portanto, com os identificadores dos municípios de São Paulo/SP e Rio de
+          Janeiro/RJ, que são 3550308 e 3304557, respectivamente
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**)
+          e o município de Goiânia/GO (**5208707**) - Por ser um município, não há
+          a necessidade de informar o nível geográfico ao qual pertence, de forma
+          que essa URL é equivalente à
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]</a>'
+        required: false
+        type: string
+      - name: classificacao
+        in: query
+        description: 'Além de estar relacionado à uma dada localidade e um determinado
+          período, os resultados das variáveis podem estar relacionados à outros conjuntos
+          de dados, que na nomenclatura do SIDRA recebe o nome de **classificação**.
+          Como exemplo, considere o agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/1712''>Produção,
+          venda, valor da produção e área colhida da lavoura temporária nos estabelecimentos
+          agropecuários</a>. Além da localidade e do período, os resultados produzidos
+          por esse agregado referem-se aos produtos produzidos, condição do produtor,
+          grupos de atividades econômica, grupos de área, grupos de área colhida e
+          pronafiano, que são as classificações do agregado - Para conhecer as classificações
+          de cada agregado, acesse seus respectivos <a href=''#api-Metadados-agregadosAgregadoMetadadosGet''>metadados</a>.
+          Aos componentes da classificação, dar-se o nome de **categoria**. Na prática,
+          você fará uso das classificações para restringir a consulta, conforme os
+          exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) e cuja condição do produtor
+          (**218**) seja proprietário (**4780**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujos produtos
+          produzidos (**226**) sejam abacaxi, alho e batata-inglesa (**4844,96608,96609**)
+          e cuja condição do produtor (**218**) seja proprietário (**4780**) no Brasil
+          (**BR**)
+
+
+          Conforme observado acima, você deve informar a classificação segundo o padrão
+          **&lt;CLASSIFICACAO>[&lt;CATEGORIA>]**, em que **&lt;CATEGORIA>** pode ser
+          uma ou mais categorias separadas por vírgula. Caso deseje informar mais
+          de uma classificação, separe-as usando o caracter **|** (pipe). Se desejar
+          obter as categorias de uma classificação, sem distinção, informe a palavra-chave
+          **all**.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?&classifcacao=226[all]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classifcacao=226[all]&localidades=BR</a>
+
+
+              Todos os resultados dos produtos produzidos (**226[all]**), referentes
+          às variáveis do agregado 1712 no Brasil (**BR**) serão retornados
+
+
+          <hr />Por padrão, **caso omitido**, serão recuperados apenas os resultados
+          referentes à categoria **Total**, que é uma categoria especial cujo identificador
+          é **0**. Você fará uso dela **sempre que não desejar restringir a classificação**
+          a uma categoria específica.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR</a>
+
+
+          Na URL acima, como não foi especificado nenhuma classificação, a resposta
+          retornada será o número de estabelecimentos agropecuários, quantidade produzida,
+          quantidade vendida, valor da produção e área colhida no Brasil (**BR**)
+
+
+
+
+          **obs**: é possível, embora raro, que alguns agregados não possuam relação
+          com nenhuma classificação, além de localidade e período. É o caso, por exemplo,
+          do agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/118''>118</a>'
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Array de variáveis - Na resposta, virá ainda os resultados
+            referentes à cada classificação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Indicador'
+  /{agregado}/periodos/{periodos}/variaveis/{variavel}:
+    get:
+      tags:
+      - Variaveis
+      summary: Variáveis por agregado, períodos pesquisados e identificador da variável
+      description: Obtém o conjunto de variáveis a partir do identificador do agregado,
+        períodos pesquisados e identificador das variáveis
+      operationId: agregadosAgregadoPeriodosPeriodosVariaveisVariavelGet
+      parameters:
+      - name: agregado
+        in: path
+        description: Identificador do agregado
+        required: true
+        type: number
+        format: int64
+        x-codegen-hasMoreRequired: true
+        x-codegen-hasMoreOptional: true
+      - name: periodos
+        in: path
+        description: 'Período do qual se deseja obter os resultados. Informe valores
+          negativos para obter os últimos resultados. Para um mês específico, informe-o
+          segundo o padrão **YYYYMM**, no qual *YYYY* refere-se ao ano e *MM* ao mês.
+          Pode conter um ou mais períodos delimitados pelo caracter **|** (pipe)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/-6/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/-6/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 nos últimos
+          seis períodos pesquisados (**-6**) **obs**: valores negativos não podem
+          ser usados conjuntamente com outros períodos
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 no primeiro
+          semestre de 2017 (**201701-201706**). Observe que é possível informar um
+          intervalo segundo o padrão **&lt;INICIO>-&lt;FIM>**
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201706/201708|201710/variaveis''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/periodos/201701-201706|201710/variaveis</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 no primeiro
+          semestre (**201701-201706**) e no mês de outubro (**201710**) de 2017
+
+
+          '
+        required: true
+        type: string
+        x-codegen-hasMoreRequired: false
+      - name: variavel
+        in: path
+        description: Um ou mais identificadores de variável separados pelo caracter
+          **|** (pipe)
+        required: true
+        type: string
+      - name: localidades
+        in: query
+        description: 'Uma ou mais localidades delimitadas pelo caracter | (pipe).
+          Caso não informada, será considerado o Brasil, cujo identificador é **BR**.
+          Para qualquer localidade que NÃO seja Macrorregião, Unidade da Federação,
+          Mesorregião, Microrregião e Município, essa deve seguir o padrão  **N&lt;NIVEL_GEOGRAFICO>[&lt;LOCALIDADE>]**
+          - Para saber mais sobre os identificadores das localidades, acesse <a target=''_blank''
+          href=''https://sidra.ibge.gov.br/territorio''>https://sidra.ibge.gov.br/territorio</a>
+          - em que **&lt;LOCALIDADE>** pode ser uma ou mais localidades separadas
+          por vírgula. É possível ainda generalizar o resultado, informando a classe
+          da localidade, conforme os exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam regiões metropolitanas (**N7**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**).
+          Observe que 3501 e 3301 são, respectivamente, os identificadores das regiões
+          metropolitanas de São Paulo e Rio de Janeiro. Não podem ser confundidos,
+          portanto, com os identificadores dos municípios de São Paulo/SP e Rio de
+          Janeiro/RJ, que são 3550308 e 3304557, respectivamente
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**)
+          e o município de Goiânia/GO (**5208707**) - Por ser um município, não há
+          a necessidade de informar o nível geográfico ao qual pertence, de forma
+          que essa URL é equivalente à
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreRequired: true
+        x-codegen-hasMoreOptional: true
+      - name: classificacao
+        in: query
+        description: 'Além de estar relacionado à uma dada localidade e um determinado
+          período, os resultados das variáveis podem estar relacionados à outros conjuntos
+          de dados, que na nomenclatura do SIDRA recebe o nome de **classificação**.
+          Como exemplo, considere o agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/1712''>Produção,
+          venda, valor da produção e área colhida da lavoura temporária nos estabelecimentos
+          agropecuários</a>. Além da localidade e do período, os resultados produzidos
+          por esse agregado referem-se aos produtos produzidos, condição do produtor,
+          grupos de atividades econômica, grupos de área, grupos de área colhida e
+          pronafiano, que são as classificações do agregado - Para conhecer as classificações
+          de cada agregado, acesse seus respectivos <a href=''#api-Metadados-agregadosAgregadoMetadadosGet''>metadados</a>.
+          Aos componentes da classificação, dar-se o nome de **categoria**. Na prática,
+          você fará uso das classificações para restringir a consulta, conforme os
+          exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) e cuja condição do produtor
+          (**218**) seja proprietário (**4780**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujos produtos
+          produzidos (**226**) sejam abacaxi, alho e batata-inglesa (**4844,96608,96609**)
+          e cuja condição do produtor (**218**) seja proprietário (**4780**) no Brasil
+          (**BR**)
+
+
+          Conforme observado acima, você deve informar a classificação segundo o padrão
+          **&lt;CLASSIFICACAO>[&lt;CATEGORIA>]**, em que **&lt;CATEGORIA>** pode ser
+          uma ou mais categorias separadas por vírgula. Caso deseje informar mais
+          de uma classificação, separe-as usando o caracter **|** (pipe). Se desejar
+          obter as categorias de uma classificação, sem distinção, informe a palavra-chave
+          **all**.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?&classifcacao=226[all]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classifcacao=226[all]&localidades=BR</a>
+
+
+              Todos os resultados dos produtos produzidos (**226[all]**), referentes
+          às variáveis do agregado 1712 no Brasil (**BR**) serão retornados
+
+
+          <hr />Por padrão, **caso omitido**, serão recuperados apenas os resultados
+          referentes à categoria **Total**, que é uma categoria especial cujo identificador
+          é **0**. Você fará uso dela **sempre que não desejar restringir a classificação**
+          a uma categoria específica.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR</a>
+
+
+          Na URL acima, como não foi especificado nenhuma classificação, a resposta
+          retornada será o número de estabelecimentos agropecuários, quantidade produzida,
+          quantidade vendida, valor da produção e área colhida no Brasil (**BR**)
+
+
+
+
+          **obs**: é possível, embora raro, que alguns agregados não possuam relação
+          com nenhuma classificação, além de localidade e período. É o caso, por exemplo,
+          do agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/118''>118</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreOptional: false
+      responses:
+        '200':
+          description: Array de variáveis - Na resposta, virá ainda os resultados
+            referentes à cada classificação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Indicador'
+  /{agregado}/variaveis:
+    get:
+      tags:
+      - Variaveis
+      summary: Variáveis por agregado
+      description: 'Funcionalmente equivalente à /agregados/{pesquisa}/periodos/-12/variaveis,
+        no qual se obtém as variáveis dos últimos 12 períodos pesquisados '
+      operationId: agregadosAgregadoVariaveisGet
+      parameters:
+      - name: agregado
+        in: path
+        description: Identificador do agregado
+        required: true
+        type: number
+        format: int64
+        x-codegen-hasMoreRequired: true
+        x-codegen-hasMoreOptional: true
+      - name: localidades
+        in: query
+        description: 'Uma ou mais localidades delimitadas pelo caracter | (pipe).
+          Caso não informada, será considerado o Brasil, cujo identificador é **BR**.
+          Para qualquer localidade que NÃO seja Macrorregião, Unidade da Federação,
+          Mesorregião, Microrregião e Município, essa deve seguir o padrão  **N&lt;NIVEL_GEOGRAFICO>[&lt;LOCALIDADE>]**
+          - Para saber mais sobre os identificadores das localidades, acesse <a target=''_blank''
+          href=''https://sidra.ibge.gov.br/territorio''>https://sidra.ibge.gov.br/territorio</a>
+          - em que **&lt;LOCALIDADE>** pode ser uma ou mais localidades separadas
+          por vírgula. É possível ainda generalizar o resultado, informando a classe
+          da localidade, conforme os exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam regiões metropolitanas (**N7**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**).
+          Observe que 3501 e 3301 são, respectivamente, os identificadores das regiões
+          metropolitanas de São Paulo e Rio de Janeiro. Não podem ser confundidos,
+          portanto, com os identificadores dos municípios de São Paulo/SP e Rio de
+          Janeiro/RJ, que são 3550308 e 3304557, respectivamente
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**)
+          e o município de Goiânia/GO (**5208707**) - Por ser um município, não há
+          a necessidade de informar o nível geográfico ao qual pertence, de forma
+          que essa URL é equivalente à
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreRequired: true
+        x-codegen-hasMoreOptional: true
+      - name: classificacao
+        in: query
+        description: 'Além de estar relacionado à uma dada localidade e um determinado
+          período, os resultados das variáveis podem estar relacionados à outros conjuntos
+          de dados, que na nomenclatura do SIDRA recebe o nome de **classificação**.
+          Como exemplo, considere o agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/1712''>Produção,
+          venda, valor da produção e área colhida da lavoura temporária nos estabelecimentos
+          agropecuários</a>. Além da localidade e do período, os resultados produzidos
+          por esse agregado referem-se aos produtos produzidos, condição do produtor,
+          grupos de atividades econômica, grupos de área, grupos de área colhida e
+          pronafiano, que são as classificações do agregado - Para conhecer as classificações
+          de cada agregado, acesse seus respectivos <a href=''#api-Metadados-agregadosAgregadoMetadadosGet''>metadados</a>.
+          Aos componentes da classificação, dar-se o nome de **categoria**. Na prática,
+          você fará uso das classificações para restringir a consulta, conforme os
+          exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) e cuja condição do produtor
+          (**218**) seja proprietário (**4780**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujos produtos
+          produzidos (**226**) sejam abacaxi, alho e batata-inglesa (**4844,96608,96609**)
+          e cuja condição do produtor (**218**) seja proprietário (**4780**) no Brasil
+          (**BR**)
+
+
+          Conforme observado acima, você deve informar a classificação segundo o padrão
+          **&lt;CLASSIFICACAO>[&lt;CATEGORIA>]**, em que **&lt;CATEGORIA>** pode ser
+          uma ou mais categorias separadas por vírgula. Caso deseje informar mais
+          de uma classificação, separe-as usando o caracter **|** (pipe). Se desejar
+          obter as categorias de uma classificação, sem distinção, informe a palavra-chave
+          **all**.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?&classifcacao=226[all]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classifcacao=226[all]&localidades=BR</a>
+
+
+              Todos os resultados dos produtos produzidos (**226[all]**), referentes
+          às variáveis do agregado 1712 no Brasil (**BR**) serão retornados
+
+
+          <hr />Por padrão, **caso omitido**, serão recuperados apenas os resultados
+          referentes à categoria **Total**, que é uma categoria especial cujo identificador
+          é **0**. Você fará uso dela **sempre que não desejar restringir a classificação**
+          a uma categoria específica.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR</a>
+
+
+          Na URL acima, como não foi especificado nenhuma classificação, a resposta
+          retornada será o número de estabelecimentos agropecuários, quantidade produzida,
+          quantidade vendida, valor da produção e área colhida no Brasil (**BR**)
+
+
+
+
+          **obs**: é possível, embora raro, que alguns agregados não possuam relação
+          com nenhuma classificação, além de localidade e período. É o caso, por exemplo,
+          do agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/118''>118</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreOptional: false
+      responses:
+        '200':
+          description: Array de variáveis - Na resposta, virá ainda os resultados
+            referentes à cada classificação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Indicador'
+  /{agregado}/variaveis/{variavel}:
+    get:
+      tags:
+      - Variaveis
+      summary: Variáveis por agregado e identificador da variável
+      description: Funcionalmente equivalente à /agregados/{pesquisa}/periodos/-12/variaveis/{variavel},
+        no qual se obtém os resultados dos indicadores dos últimos 12 períodos pesquisados
+      operationId: agregadosAgregadoVariaveisVariavelGet
+      parameters:
+      - name: agregado
+        in: path
+        description: Identificador do agregado
+        required: true
+        type: number
+        format: int64
+        x-codegen-hasMoreRequired: false
+        x-codegen-hasMoreOptional: true
+      - name: variavel
+        in: path
+        description: Um ou mais identificadores de variável separados pelo caracter
+          **|** (pipe)
+        required: true
+        type: string
+        x-codegen-hasMoreRequired: false
+      - name: localidades
+        in: query
+        description: 'Uma ou mais localidades delimitadas pelo caracter | (pipe).
+          Caso não informada, será considerado o Brasil, cujo identificador é **BR**.
+          Para qualquer localidade que NÃO seja Macrorregião, Unidade da Federação,
+          Mesorregião, Microrregião e Município, essa deve seguir o padrão  **N&lt;NIVEL_GEOGRAFICO>[&lt;LOCALIDADE>]**
+          - Para saber mais sobre os identificadores das localidades, acesse <a target=''_blank''
+          href=''https://sidra.ibge.gov.br/territorio''>https://sidra.ibge.gov.br/territorio</a>
+          - em que **&lt;LOCALIDADE>** pode ser uma ou mais localidades separadas
+          por vírgula. É possível ainda generalizar o resultado, informando a classe
+          da localidade, conforme os exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam regiões metropolitanas (**N7**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**).
+          Observe que 3501 e 3301 são, respectivamente, os identificadores das regiões
+          metropolitanas de São Paulo e Rio de Janeiro. Não podem ser confundidos,
+          portanto, com os identificadores dos municípios de São Paulo/SP e Rio de
+          Janeiro/RJ, que são 3550308 e 3304557, respectivamente
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|5208707</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1705 cujas localidades
+          sejam as regiões metropolitanas (**N7**) de São Paulo e Rio de Janeiro (**3501,3301**)
+          e o município de Goiânia/GO (**5208707**) - Por ser um município, não há
+          a necessidade de informar o nível geográfico ao qual pertence, de forma
+          que essa URL é equivalente à
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]''>https://servicodados.ibge.gov.br/api/v2/agregados/1705/variaveis?localidades=N7[3501,3301]|N6[5208707]</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreRequired: true
+        x-codegen-hasMoreOptional: true
+      - name: classificacao
+        in: query
+        description: 'Além de estar relacionado à uma dada localidade e um determinado
+          período, os resultados das variáveis podem estar relacionados à outros conjuntos
+          de dados, que na nomenclatura do SIDRA recebe o nome de **classificação**.
+          Como exemplo, considere o agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/1712''>Produção,
+          venda, valor da produção e área colhida da lavoura temporária nos estabelecimentos
+          agropecuários</a>. Além da localidade e do período, os resultados produzidos
+          por esse agregado referem-se aos produtos produzidos, condição do produtor,
+          grupos de atividades econômica, grupos de área, grupos de área colhida e
+          pronafiano, que são as classificações do agregado - Para conhecer as classificações
+          de cada agregado, acesse seus respectivos <a href=''#api-Metadados-agregadosAgregadoMetadadosGet''>metadados</a>.
+          Aos componentes da classificação, dar-se o nome de **categoria**. Na prática,
+          você fará uso das classificações para restringir a consulta, conforme os
+          exemplos a seguir
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujo produto
+          produzido (**226**) seja abacaxi (**4844**) e cuja condição do produtor
+          (**218**) seja proprietário (**4780**) no Brasil (**BR**)
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classificacao=226[4844,96608,96609]|218[4780]&localidades=BR</a>
+
+
+              Obtém os resultados referentes às variáveis do agregado 1712 cujos produtos
+          produzidos (**226**) sejam abacaxi, alho e batata-inglesa (**4844,96608,96609**)
+          e cuja condição do produtor (**218**) seja proprietário (**4780**) no Brasil
+          (**BR**)
+
+
+          Conforme observado acima, você deve informar a classificação segundo o padrão
+          **&lt;CLASSIFICACAO>[&lt;CATEGORIA>]**, em que **&lt;CATEGORIA>** pode ser
+          uma ou mais categorias separadas por vírgula. Caso deseje informar mais
+          de uma classificação, separe-as usando o caracter **|** (pipe). Se desejar
+          obter as categorias de uma classificação, sem distinção, informe a palavra-chave
+          **all**.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?&classifcacao=226[all]&localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?classifcacao=226[all]&localidades=BR</a>
+
+
+              Todos os resultados dos produtos produzidos (**226[all]**), referentes
+          às variáveis do agregado 1712 no Brasil (**BR**) serão retornados
+
+
+          <hr />Por padrão, **caso omitido**, serão recuperados apenas os resultados
+          referentes à categoria **Total**, que é uma categoria especial cujo identificador
+          é **0**. Você fará uso dela **sempre que não desejar restringir a classificação**
+          a uma categoria específica.
+
+
+          <a href=''https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR''>https://servicodados.ibge.gov.br/api/v2/agregados/1712/variaveis?localidades=BR</a>
+
+
+          Na URL acima, como não foi especificado nenhuma classificação, a resposta
+          retornada será o número de estabelecimentos agropecuários, quantidade produzida,
+          quantidade vendida, valor da produção e área colhida no Brasil (**BR**)
+
+
+
+
+          **obs**: é possível, embora raro, que alguns agregados não possuam relação
+          com nenhuma classificação, além de localidade e período. É o caso, por exemplo,
+          do agregado <a target=''_blank'' href=''https://sidra.ibge.gov.br/tabela/118''>118</a>'
+        required: false
+        type: string
+        x-codegen-hasMoreOptional: false
+      responses:
+        '200':
+          description: Array de variáveis - Na resposta, virá ainda os resultados
+            referentes à cada classificação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Indicador'
+definitions:
+  Agregado:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Identificador do agregado
+      nome:
+        type: string
+        description: Nome do agregado
+  Indicador:
+    type: object
+    properties:
+      ug_cod:
+        type: string
+        description: Identificador da localidade
+      ug:
+        type: string
+        description: Localidade
+      p_cod:
+        type: string
+        description: Identificador do período
+      p:
+        type: string
+        description: Período
+      var_cod:
+        type: string
+        description: Identificador do indicador
+      var:
+        type: string
+        description: Indicador
+      um:
+        type: string
+        description: Unidade de medida do resultado
+      v:
+        type: string
+        description: Resultado do indicador
+  Metadado:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador do agregado
+      nome:
+        type: string
+        description: Nome do agregado
+      pesquisa:
+        type: string
+        description: Pesquisa ao qual pertence o agregado
+      periodicidade:
+        $ref: '#/definitions/Metadado_periodicidade'
+      nivelTerritorial:
+        $ref: '#/definitions/Metadado_nivelTerritorial'
+      variaveis:
+        type: array
+        items:
+          $ref: '#/definitions/Metadado_variaveis'
+      classificacoes:
+        type: array
+        items:
+          $ref: '#/definitions/Metadado_classificacoes'
+  Metadado_categorias:
+    properties:
+      id:
+        type: number
+        description: Identificador da categoria
+      nome:
+        type: string
+        description: Nome da categoria
+      unidade:
+        type: string
+        description: Unidade da categoria. Pode assumir valor null
+  Metadado_classificacoes:
+    properties:
+      id:
+        type: number
+        description: Identificador da classificação
+      nome:
+        type: string
+        description: Nome da classificação
+      sumarizacao:
+        $ref: '#/definitions/Metadado_sumarizacao'
+      categorias:
+        type: array
+        items:
+          $ref: '#/definitions/Metadado_categorias'
+  Metadado_nivelTerritorial:
+    properties:
+      Administrativo:
+        type: array
+        description: 'Quando o agregado abranger qualquer divisão político-administrativa
+          do Brasil. Pode assumir os seguintes valores: N1 (Brasil), N2 (Região),
+          N3 (Unidade da Federação), N8 (Mesorregião), N9 (Microrregião), N6 (Município)'
+        items:
+          type: string
+      Especial:
+        type: array
+        description: 'Quando o agregado abranger alguma divisão especial. Pode assumir
+          os seguintes valores: N129 (Territórios da cidadania), N7 (Região metropolitana)'
+        items:
+          type: string
+      IBGE:
+        type: array
+        description: 'Quando o agregado abranger alguma divisão específica do IBGE.
+          Pode assumir os seguintes valores: N23 (Arranjo populacional)'
+        items:
+          type: string
+    description: Nível abrangido pelo agregado
+  Metadado_periodicidade:
+    properties:
+      frequencia:
+        type: string
+        description: Frequência na qual são coletados os dados do agregado. Caso a
+          frequência seja mensal, o formato do período seguirá o padrão YYYYMM, no
+          qual YYYY refere-se ao ano e MM ao mês
+      inicio:
+        type: string
+        description: Período inicial da coleta dos dados
+      fim:
+        type: string
+        description: Último período coletado
+  Metadado_sumarizacao:
+    properties:
+      status:
+        type: boolean
+        description: Informa se as categorias da classificação podem ser somadas para
+          obter-se o resultado da classificação
+      excecao:
+        type: boolean
+        description: Informa quais categorias da classificação devem ser desconsideradas
+          ao obter a sumarização da classificação
+    description: Equivalente a propriedade variaveis.sumarização, exceto pelo fato
+      que esta refere-se à soma das categorias para obter-se o resultado da classificação
+  Metadado_variaveis:
+    properties:
+      id:
+        type: number
+        description: Identificador da variável
+      nome:
+        type: string
+        description: Nome da variável
+      unidade:
+        type: string
+        description: Unidade da variável
+      sumarizacao:
+        type: array
+        description: Informa qual dimensões podem ser sumarizadas - Por exemplo, se
+          você somar os resultados das variáveis referentes às Unidades da Federação,
+          obterá o resultado do Brasil. Da mesma forma, se você somar resultados das
+          variáveis referentes aos meses do ano, obterá o resultado do respectivo
+          ano. Valores possíveis são nivelTerritorial e periodo
+        items:
+          type: string
+  Pesquisa:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identificador da pesquisa
+      nome:
+        type: string
+        description: Nome da pesquisa
+      agregados:
+        type: array
+        items:
+          $ref: '#/definitions/Agregado'
+

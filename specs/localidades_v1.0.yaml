@@ -1,0 +1,555 @@
+info:
+  version: 1.0.0
+  title: API de localidades
+  description: "API referente às divisões administrativas do Brasil.  \n  \n**obs:**\
+    \ os identificadores providos pela presente API são oficiais para uso da\nAdministração\
+    \ pública. Por exemplo, os dois primeiros dígitos do código de\nacesso da [Nota\
+    \ Fiscal eletrônica - NF-e](http://www.nfe.fazenda.gov.br)\nreferem-se ao identificador\
+    \ da Unidade de Federação de onde foi emitida a NF-e.\nEsse identificador é o\
+    \ fornecido pelo IBGE"
+externalDocs:
+  description: Documentação oficial
+  url: https://servicodados.ibge.gov.br/api/docs/localidades?versao=1
+swagger: '2.0'
+host: servicodados.ibge.gov.br
+basePath: /api/v1/localidades
+schemes:
+- https
+produces:
+- application/json
+tags:
+- name: Mesorregioes
+- name: Microrregioes
+- name: Municipios
+- name: Regioes
+- name: UFs
+paths:
+  /estados/{UF}/mesorregioes:
+    get:
+      tags:
+      - Mesorregioes
+      summary: Mesorregiões por UF
+      description: Obtém o conjunto de mesorregiões do Brasil a partir dos identificadores
+        das Unidades da Federação
+      operationId: estadosUFMesorregioesGet
+      parameters:
+      - name: UF
+        in: path
+        description: "Um ou mais identificadores de Unidades da Federação delimitados\
+          \ pelo caracter | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/mesorregioes\
+          \ \n\n    Obtém os dados referentes às mesorregiões do Rio de Janeiro (**33**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33|35/mesorregioes\
+          \ \n\n    Obtém os dados referentes às mesorregiões do Rio de Janeiro (**33**)\
+          \ e São Paulo (**35**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de mesorregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Mesorregiao'
+  /mesorregioes:
+    get:
+      tags:
+      - Mesorregioes
+      summary: Mesorregiões
+      description: Obtém o conjunto de mesorregiões do Brasil
+      operationId: mesorregioesGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de mesorregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Mesorregiao'
+  /mesorregioes/{mesorregiao}:
+    get:
+      tags:
+      - Mesorregioes
+      summary: Mesorregião por identificador
+      description: Obtém o conjunto de mesorregiões do Brasil a partir dos respectivos
+        identificadores
+      operationId: mesorregioesMesorregiaoGet
+      parameters:
+      - name: mesorregiao
+        in: path
+        description: "Um ou mais identificadores de mesorregiões delimitados pelo\
+          \ caracter | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3301\
+          \ \n\n    Obtém os dados referentes à mesorregião com identificador **3301**\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3302|3509\
+          \ \n\n    Obtém os dados referentes às mesorregiões com identificadores\
+          \ **3302** e **3509**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de mesorregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Mesorregiao'
+  /regioes/{macrorregiao}/mesorregioes:
+    get:
+      tags:
+      - Mesorregioes
+      summary: Mesorregiões por região
+      description: Obtém o conjunto de mesorregiões do Brasil a partir dos identificadores
+        das regiões
+      operationId: regioesMacrorregiaoMesorregioesGet
+      parameters:
+      - name: macrorregiao
+        in: path
+        description: "Um ou mais identificadores de regiões delimitados pelo caracter\
+          \ | (pipe)\n\n Exemplos: \n\n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3/mesorregioes\
+          \ \n\n    Obtém os dados referentes às mesorregiões da região Sudeste (**3**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3|4/mesorregioes\
+          \ \n\n    Obtém os dados referentes às mesorregiões das regiões Sudeste\
+          \ (**3**) e Sul (**4**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de mesorregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Mesorregiao'
+  /estados/{UF}/microrregioes:
+    get:
+      tags:
+      - Microrregioes
+      summary: Microrregiões por UF
+      description: Obtém o conjunto de microrregiões do Brasil a partir dos identificadores
+        das Unidades da Federação
+      operationId: estadosUFMicrorregioesGet
+      parameters:
+      - name: UF
+        in: path
+        description: "Um ou mais identificadores de Unidades da Federação delimitados\
+          \ pelo caracter | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões do Rio de Janeiro (**33**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33|35/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões do Rio de Janeiro (**33**)\
+          \ e São Paulo (**35**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de microrregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Microrregiao'
+  /mesorregioes/{mesorregiao}/microrregioes:
+    get:
+      tags:
+      - Microrregioes
+      summary: Microrregiões por mesorregião
+      description: Obtém o conjunto de microrregiões do Brasil a partir dos identificadores
+        das mesorregiões
+      operationId: mesorregioesMesorregiaoMicrorregioesGet
+      parameters:
+      - name: mesorregiao
+        in: path
+        description: "Um ou mais identificadores de mesorregiões delimitados pelo\
+          \ caracter | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3303/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões da mesorregião com\
+          \ identificador **3303**\n\n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3303|3304/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões das mesorregiões com\
+          \ identificadores **3303** e **3304**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de microrregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Microrregiao'
+  /microrregioes:
+    get:
+      tags:
+      - Microrregioes
+      summary: Microrregiões
+      description: Obtém o conjunto de microrregiões do Brasil
+      operationId: microrregioesGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de microrregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Microrregiao'
+  /microrregioes/{microrregiao}:
+    get:
+      tags:
+      - Microrregioes
+      summary: Microrregião por identificador
+      description: Obtém o conjunto de microrregiões do Brasil a partir dos respectivos
+        identificadores
+      operationId: microrregioesMicrorregiaoGet
+      parameters:
+      - name: microrregiao
+        in: path
+        description: "Um ou mais identificadores de microrregiões delimitados pelo\
+          \ caracter | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/microrregioes/33007/\
+          \ \n\n    Obtém os dados referentes à microrregião com identificador **33007**\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/microrregioes/31007|33007\
+          \ \n\n    Obtém os dados referentes às microrregiões com identificadores\
+          \ **31007** e **33007**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de microrregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Microrregiao'
+  /regioes/{macrorregiao}/microrregioes:
+    get:
+      tags:
+      - Microrregioes
+      summary: Microrregiões por região
+      description: Obtém o conjunto de microrregiões do Brasil a partir dos identificadores
+        das regiões
+      operationId: regioesMacrorregiaoMicrorregioesGet
+      parameters:
+      - name: macrorregiao
+        in: path
+        description: "Um ou mais identificadores de regiões delimitados pelo caracter\
+          \ | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões da região Sudeste (**3**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3|4/microrregioes\
+          \ \n\n    Obtém os dados referentes às microrregiões das regiões Sudeste\
+          \ (**3**) e Sul (**4**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de microrregiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Microrregiao'
+  /estados/{UF}/municipios:
+    get:
+      tags:
+      - Municipios
+      summary: Municípios por UF
+      description: Obtém o conjunto de municípios do Brasil a partir dos identificadores
+        das Unidades da Federação
+      operationId: estadosUFMunicipiosGet
+      parameters:
+      - name: UF
+        in: path
+        description: "Um ou mais identificadores de Unidades da Federação delimitados\
+          \ pelo caracter | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios do Rio de Janeiro (**33**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33|35/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios do Rio de Janeiro (**33**)\
+          \ e São Paulo (**35**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /mesorregioes/{mesorregiao}/municipios:
+    get:
+      tags:
+      - Municipios
+      summary: Municípios por mesorregião
+      description: Obtém o conjunto de municípios do Brasil a partir dos identificadores
+        das mesorregiões
+      operationId: mesorregioesMesorregiaoMunicipiosGet
+      parameters:
+      - name: mesorregiao
+        in: path
+        description: "Um ou mais identificadores de mesorregiões delimitados pelo\
+          \ caracter | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3301/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios da mesorregião com identificador\
+          \ **3301**\n\n http://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes/3301|3302/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios das mesorregiões com\
+          \ identificadores **3301** e **3302**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /microrregioes/{microrregiao}/municipios:
+    get:
+      tags:
+      - Municipios
+      summary: Municípios por microrregião
+      description: Obtém o conjunto de municípios do Brasil a partir dos identificadores
+        das microrregiões
+      operationId: microrregioesMicrorregiaoMunicipiosGet
+      parameters:
+      - name: microrregiao
+        in: path
+        description: "Um ou mais identificadores de microrregiões delimitados pelo\
+          \ caracter | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/microrregioes/33001/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios da microrregião com identificador\
+          \ **33001**\n\n http://servicodados.ibge.gov.br/api/v1/localidades/microrregioes/33001|31001/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios das microrregiões com\
+          \ identificadores **33001** e **31001**"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /municipios:
+    get:
+      tags:
+      - Municipios
+      summary: Municípios
+      description: Obtém o conjunto de municípios do Brasil
+      operationId: municipiosGet
+      parameters: []
+      responses:
+        '200':
+          description: Um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /municipios/{municipio}:
+    get:
+      tags:
+      - Municipios
+      summary: Município por identificador
+      description: Obtém o conjunto de municípios do Brasil a partir dos respectivos
+        identificadores
+      operationId: municipiosMunicipioGet
+      parameters:
+      - name: municipio
+        in: path
+        description: "Um ou mais identificadores de municipios delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/municipios/3303609\
+          \ \n\n    Obtém os dados referentes ao município de Paracambi/RJ (**3303609**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/municipios/1502004|3303609\
+          \ \n\n    Obtém os dados referentes ao município de Paracambi/RJ (**3303609**)\
+          \ e Cachoeira do Arari/PA (**1502004**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /regioes/{macrorregiao}/municipios:
+    get:
+      tags:
+      - Municipios
+      summary: Municípios por região
+      description: Obtém o conjunto de municípios do Brasil a partir dos identificadores
+        das regiões
+      operationId: regioesMacrorregiaoMunicipiosGet
+      parameters:
+      - name: macrorregiao
+        in: path
+        description: "Um ou mais identificadores de regiões delimitados pelo caracter\
+          \ | (pipe)\n\n Exemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios da região Sudeste (**3**)\n\
+          \n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3|4/municipios\
+          \ \n\n    Obtém os dados referentes aos municípios das regiões Sudeste (**3**)\
+          \ e Sul (**4**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de municípios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Municipio'
+  /regioes:
+    get:
+      tags:
+      - Regioes
+      summary: Regiões
+      description: Obtém o conjunto de regiões do Brasil
+      operationId: regioesGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de regiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Macrorregiao'
+  /regioes/{macrorregiao}:
+    get:
+      tags:
+      - Regioes
+      summary: Região por identificador
+      description: Obtém o conjunto de regiões do Brasil a partir dos respectivos
+        identificadores
+      operationId: regioesMacrorregiaoGet
+      parameters:
+      - name: macrorregiao
+        in: path
+        description: "Um ou mais identificadores de regiões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n https://servicodados.ibge.gov.br/api/v1/localidades/regioes/1\
+          \ \n\n    Obtém os dados referentes à região Norte (**1**)\n\n https://servicodados.ibge.gov.br/api/v1/localidades/regioes/1|2|3|4|5\
+          \ \n\n    Obtéms os dados referentes às regiões Norte (**1**), Nordeste\
+          \ (**2**), Sudeste (**3**), Sul (**4**) e Centro-Oeste (**5**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de regiões
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Macrorregiao'
+  /estados:
+    get:
+      tags:
+      - UFs
+      summary: UFs
+      description: Obtém o conjunto de Unidades da Federação do Brasil
+      operationId: estadosGet
+      parameters: []
+      responses:
+        '200':
+          description: Array de Unidades da Federação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UF'
+  /estados/{UF}:
+    get:
+      tags:
+      - UFs
+      summary: UF por identificador
+      description: Obtém o conjunto de Unidades da Federação do Brasil a partir dos
+        respectivos identificadores
+      operationId: estadosUFGet
+      parameters:
+      - name: UF
+        in: path
+        description: "Um ou mais identificadores de Unidades da Federação delimitados\
+          \ pelo caracter | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33\
+          \ \n\n    Obtém os dados referentes ao Rio de Janeiro (**33**)\n\n http://servicodados.ibge.gov.br/api/v1/localidades/estados/33|35\
+          \ \n\n    Obtém os dados referentes ao Rio de Janeiro (**33**) e São Paulo\
+          \ (**35**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um objeto - Caso apenas um identificador seja informado - ou
+            um array de Unidades da Federação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UF'
+  /regioes/{macrorregiao}/estados:
+    get:
+      tags:
+      - UFs
+      summary: UFs por região
+      description: Obtém o conjunto de Unidades da Federação do Brasil a partir dos
+        identificadores da regiões
+      operationId: regioesMacrorregiaoEstadosGet
+      parameters:
+      - name: macrorregiao
+        in: path
+        description: "Um ou mais identificadores de regiões delimitados pelo caracter\
+          \ | (pipe)\n\nExemplos:\n\n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3/estados\
+          \ \n\n    Obtém os dados referentes às Unidades da Federação da região Sudeste\
+          \ (**3**)\n\n http://servicodados.ibge.gov.br/api/v1/localidades/regioes/3|4/estados\
+          \ \n\n    Obtém os dados referentes às Unidades da Federação das regiões\
+          \ Sudeste (**3**) e Sul (**4**)"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Um array de Unidades da Federação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UF'
+definitions:
+  Macrorregiao:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador da região
+      nome:
+        type: string
+        description: Nome da região
+      sigla:
+        type: string
+        description: Sigla da região
+  Mesorregiao:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador da mesorregião
+      nome:
+        type: string
+        description: Nome do mesorregião
+      UF:
+        $ref: '#/definitions/UF'
+  Microrregiao:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador da microrregião
+      nome:
+        type: string
+        description: Nome do microrregião
+      mesorregiao:
+        $ref: '#/definitions/Mesorregiao'
+  Municipio:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador do município
+      nome:
+        type: string
+        description: Nome do município
+      microrregiao:
+        $ref: '#/definitions/Microrregiao'
+  UF:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Identificador da Unidade da Federação
+      nome:
+        type: string
+        description: Nome da Unidade da Federação
+      sigla:
+        type: string
+        description: Sigla da Unidade da Federação
+      regiao:
+        $ref: '#/definitions/Macrorregiao'
+
